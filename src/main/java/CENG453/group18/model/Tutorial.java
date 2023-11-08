@@ -1,4 +1,4 @@
-package com.bezkoder.spring.swagger.model;
+package CENG453.group18.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

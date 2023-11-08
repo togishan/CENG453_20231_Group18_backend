@@ -1,4 +1,4 @@
-package com.bezkoder.spring.swagger.config;
+package CENG453.group18.config;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
-
+/*
 @Configuration
 public class OpenAPIConfig {
 
@@ -48,3 +48,4 @@ public class OpenAPIConfig {
     return new OpenAPI().info(info).servers(List.of(devServer, prodServer));
   }
 }
+*/

@@ -1,11 +1,11 @@
-package com.bezkoder.spring.swagger.service;
+package CENG453.group18.service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.bezkoder.spring.swagger.model.Tutorial;
+import CENG453.group18.model.Tutorial;
 
 @Service
 public class TutorialService {
