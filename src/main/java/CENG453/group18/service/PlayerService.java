@@ -24,13 +24,14 @@ public class PlayerService {
             return playerRepository.save(player);
         }
     }
+
     public List<Player> getAllPlayers()
     {
         return (List<Player>) playerRepository.findAll();
     }
     public void deletePlayer(String username)
     {
-        if(playerRepository.existsPlayerByUsername(username))
+        if(!playerRepository.existsPlayerByUsername(username))
         {
             return;
         }
