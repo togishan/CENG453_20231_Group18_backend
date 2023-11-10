@@ -21,7 +21,7 @@ public class Score {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "scoreID")
-    private Integer id;
+    private Integer scoreID;
     @Column(name = "score", nullable = false)
     private Integer score;
     @Column(name= "creation_date", nullable = false)
@@ -46,7 +46,7 @@ public class Score {
     {
         if(obj instanceof Score score)
         {
-            return this.id.equals(score.id);
+            return this.scoreID.equals(score.getScoreID());
         }
         return false;
     }

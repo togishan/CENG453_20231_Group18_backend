@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -28,25 +29,21 @@ public class ScoreController {
     @ApiResponses({
             @ApiResponse(responseCode = "201", content = {
                     @Content(schema = @Schema(implementation = Score.class), mediaType = "application/json") }),
-            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
-    public Score saveByAdjustingDate(String username, int playerScore, LocalDate date)
+    })
+    public ResponseEntity<Score> saveByAdjustingDate(String username, int playerScore, LocalDate date)
     {
-        return scoreService.saveScoreByAdjustingDate(username, playerScore, date);
+        return ResponseEntity.ok(scoreService.saveScoreByAdjustingDate(username, playerScore, date));
     }
-
-
-
-
 
     @Operation(summary = "Saves score to table" , tags = { "scores", "post" })
     @PostMapping
     @ApiResponses({
-            @ApiResponse(responseCode = "201", content = {
+            @ApiResponse(responseCode = "200", content = {
                     @Content(schema = @Schema(implementation = Score.class), mediaType = "application/json") }),
-            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
-    public Score saveScore(String username, int playerScore)
+            })
+    public ResponseEntity<Score> saveScore(String username, int playerScore)
     {
-        return scoreService.saveScore(username, playerScore);
+        return ResponseEntity.ok(scoreService.saveScore(username, playerScore));
     }
 
     @Operation(summary = "Retrieve all Scores", tags = { "scores", "get" })
@@ -54,12 +51,16 @@ public class ScoreController {
             @ApiResponse(responseCode = "200", content = {
                     @Content(schema = @Schema(implementation = Score.class), mediaType = "application/json") }),
             @ApiResponse(responseCode = "204", description = "There are no Scores", content = {
-                    @Content(schema = @Schema()) }),
-            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
+                    @Content(schema = @Schema()) })})
     @GetMapping("/allTime")
-    public List<ScoreDTO> findAllTimeScores()
+    public ResponseEntity<List<ScoreDTO>> findAllTimeScores()
     {
-        return scoreService.getAllTimeScores();
+        List<ScoreDTO> scoreTable = scoreService.getAllTimeScores();
+        if(scoreTable.isEmpty())
+        {
+            return ResponseEntity.status(204).body(scoreTable);
+        }
+        return ResponseEntity.ok(scoreTable);
     }
 
     @Operation(summary = "Retrieve scores recorded in the last month", tags = { "scores", "get" })
@@ -67,12 +68,16 @@ public class ScoreController {
             @ApiResponse(responseCode = "200", content = {
                     @Content(schema = @Schema(implementation = Score.class), mediaType = "application/json") }),
             @ApiResponse(responseCode = "204", description = "There are no Scores", content = {
-                    @Content(schema = @Schema()) }),
-            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
+                    @Content(schema = @Schema()) })})
     @GetMapping("/lastMonth")
-    public List<ScoreDTO> findLastMonthScores()
+    public ResponseEntity<List<ScoreDTO>> findLastMonthScores()
     {
-        return scoreService.getLastMonthScores();
+        List<ScoreDTO> scoreTable = scoreService.getLastMonthScores();
+        if(scoreTable.isEmpty())
+        {
+            return ResponseEntity.status(204).body(scoreTable);
+        }
+        return ResponseEntity.ok(scoreTable);
     }
 
     @Operation(summary = "Retrieve scores recorded in the last week", tags = { "scores", "get" })
@@ -80,11 +85,15 @@ public class ScoreController {
             @ApiResponse(responseCode = "200", content = {
                     @Content(schema = @Schema(implementation = Score.class), mediaType = "application/json") }),
             @ApiResponse(responseCode = "204", description = "There are no Scores", content = {
-                    @Content(schema = @Schema()) }),
-            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
+                    @Content(schema = @Schema()) })})
     @GetMapping("/lastWeek")
-    public List<ScoreDTO> findLastWeekScores()
+    public  ResponseEntity<List<ScoreDTO>> findLastWeekScores()
     {
-        return scoreService.getLastWeekScores();
+        List<ScoreDTO> scoreTable = scoreService.getLastWeekScores();
+        if(scoreTable.isEmpty())
+        {
+            return ResponseEntity.status(204).body(scoreTable);
+        }
+        return ResponseEntity.ok(scoreTable);
     }
 }

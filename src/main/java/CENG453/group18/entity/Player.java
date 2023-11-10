@@ -19,13 +19,15 @@ import java.util.List;
 public class Player {
     @Id@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "playerID")
-    private Integer id;
+    private Integer playerID;
     @Column(name = "username", unique = true, nullable = false)
     private String username;
     @Column(name = "email", unique = true, nullable = false)
     private String email;
     @Column(name = "password", nullable = false)
     private String password;
+    @Column(name = "session_key")
+    private String sessionKey;
 
     /*
         A player can have multiple scores,
@@ -45,7 +47,7 @@ public class Player {
     {
         if(obj instanceof Player player)
         {
-            return this.id.equals(player.getId());
+            return this.playerID.equals(player.getPlayerID());
         }
         return false;
     }
