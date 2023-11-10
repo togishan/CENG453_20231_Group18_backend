@@ -27,7 +27,7 @@ public class PlayerController {
                     @Content(schema = @Schema(implementation = Player.class), mediaType = "application/json") }),
             @ApiResponse(responseCode = "204", description = "There are no Players", content = {
                     @Content(schema = @Schema()) })})
-    @GetMapping
+    @GetMapping("/allPlayers")
     public ResponseEntity<List<Player>> findAllPlayers()
     {
         List<Player> players = playerService.getAllPlayers();
@@ -37,6 +37,18 @@ public class PlayerController {
         }
         return ResponseEntity.ok(playerService.getAllPlayers());
     }
+    @Operation(summary = "Retrieve Player Info from the Database using SessionKey", tags = { "players", "get" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {
+                    @Content(schema = @Schema(implementation = Player.class), mediaType = "application/json") }),
+            })
+    @GetMapping
+    public ResponseEntity<Player> getPlayer(@RequestHeader("Session-Key") String sessionKey)
+    {
+        return ResponseEntity.ok(playerService.getPlayerBySessionKey(sessionKey));
+    }
+
+
 
     @Operation(summary = "Create a new Player if there is no such recorded user with the same name or email" , tags = { "players", "post" })
     @PostMapping("/register")

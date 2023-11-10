@@ -17,6 +17,15 @@ public class PlayerService {
     @Autowired
     private PlayerRepository playerRepository;
 
+    public List<Player> getAllPlayers()
+    {
+        return (List<Player>) playerRepository.findAll();
+    }
+    public Player getPlayerBySessionKey(String sessionKey)
+    {
+        return playerRepository.findPlayerBySessionKey(sessionKey);
+    }
+
     public Player registerPlayer(RegisterDTO registerDTO) throws NoSuchAlgorithmException {
 
         if(playerRepository.existsPlayerByEmail(registerDTO.getEmail()) || playerRepository.existsPlayerByUsername(registerDTO.getUsername()))
@@ -49,10 +58,7 @@ public class PlayerService {
         return null;
     }
 
-    public List<Player> getAllPlayers()
-    {
-        return (List<Player>) playerRepository.findAll();
-    }
+
 
     private String hashPassword(String password) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-256");

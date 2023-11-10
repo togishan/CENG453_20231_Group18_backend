@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 public interface PlayerRepository extends JpaRepository<Player, Long>{
     Player findPlayerByUsername(String username);
     Player findPlayerByEmail(String email);
+    Player findPlayerBySessionKey(String sessionKey);
     boolean existsPlayerByUsername(String username);
     boolean existsPlayerByEmail(String email);
     void deleteByUsername(String username);
