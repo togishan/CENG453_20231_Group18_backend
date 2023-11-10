@@ -14,7 +14,6 @@ public class PlayerService {
 
     public Player registerPlayer(Player player)
     {
-
         if(playerRepository.existsPlayerByEmail(player.getEmail()) || playerRepository.existsPlayerByUsername(player.getUsername()))
         {
             return null;
@@ -28,17 +27,6 @@ public class PlayerService {
     public List<Player> getAllPlayers()
     {
         return (List<Player>) playerRepository.findAll();
-    }
-    public void deletePlayer(String username)
-    {
-        if(!playerRepository.existsPlayerByUsername(username))
-        {
-            return;
-        }
-        else
-        {
-            playerRepository.delete(playerRepository.findPlayerByUsername(username));
-        }
     }
 
 }

@@ -40,12 +40,4 @@ public class PlayerController {
         return playerService.registerPlayer(player);
     }
 
-    @Operation(summary = "Delete a Player by username", tags = { "players", "delete" })
-    @ApiResponses({ @ApiResponse(responseCode = "204", content = { @Content(schema = @Schema()) }),
-            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
-    @DeleteMapping("/{username}")
-    public void deletePlayer(String username)
-    {
-        playerService.deletePlayer(username);
-    }
 }
