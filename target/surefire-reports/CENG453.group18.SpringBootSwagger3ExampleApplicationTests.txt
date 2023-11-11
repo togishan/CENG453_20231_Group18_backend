@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: CENG453.group18.SpringBootSwagger3ExampleApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.592 s - in CENG453.group18.SpringBootSwagger3ExampleApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.575 s - in CENG453.group18.SpringBootSwagger3ExampleApplicationTests

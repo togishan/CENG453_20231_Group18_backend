@@ -30,7 +30,7 @@ public class Player {
     @Column(name = "session_key")
     private String sessionKey;
     @Column(name = "resetToken")
-
+    private String resetToken;
     /*
         A player can have multiple scores,
         A score can only belong to the single player
