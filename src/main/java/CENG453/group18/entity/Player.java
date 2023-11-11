@@ -3,12 +3,13 @@ package CENG453.group18.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Transactional
 @Setter
 @Entity
 @AllArgsConstructor
@@ -28,6 +29,7 @@ public class Player {
     private String password;
     @Column(name = "session_key")
     private String sessionKey;
+    @Column(name = "resetToken")
 
     /*
         A player can have multiple scores,

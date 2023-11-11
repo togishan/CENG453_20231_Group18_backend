@@ -3,14 +3,16 @@ package CENG453.group18.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.*;
 import org.checkerframework.checker.units.qual.C;
 
 import java.time.LocalDate;
 import java.util.Date;
 
-    @Getter
-    @Setter
+@Transactional
+@Getter
+@Setter
 @Entity
 @AllArgsConstructor
 @Data
