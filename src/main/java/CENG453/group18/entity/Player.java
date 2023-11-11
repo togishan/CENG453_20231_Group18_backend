@@ -27,10 +27,10 @@ public class Player {
     private String email;
     @Column(name = "password", nullable = false)
     private String password;
-    @Column(name = "session_key")
+    @Column(name = "sessionKey")
     private String sessionKey;
-    @Column(name = "resetToken")
-    private String resetToken;
+    @Column(name = "resetKey")
+    private String resetKey;
     /*
         A player can have multiple scores,
         A score can only belong to the single player

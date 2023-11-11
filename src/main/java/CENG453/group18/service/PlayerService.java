@@ -8,27 +8,25 @@ import CENG453.group18.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.mail.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+
 import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.logging.Logger;
 
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMultipart;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-
-
-import javax.mail.internet.MimeBodyPart;
-
-import javax.mail.internet.MimeMultipart;
-
 
 
 @Service
@@ -36,17 +34,20 @@ public class PlayerService {
     @Autowired
     private PlayerRepository playerRepository;
     private static final int TOKEN_LENGTH = 32;
+    private static final Logger LOGGER = Logger.getLogger(PlayerService.class.getName());
 
-    public List<Player> getAllPlayers()
-    {
+    public List<Player> getAllPlayers() {
         return (List<Player>) playerRepository.findAll();
     }
-    public Player getPlayerBySessionKey(String sessionKey)
-    {
+
+    public Player getPlayerBySessionKey(String sessionKey) {
         return playerRepository.findPlayerBySessionKey(sessionKey);
     }
 
     public Player registerPlayer(RegisterDTO registerDTO) throws NoSuchAlgorithmException {
+        if (registerDTO.getPassword() == null) {
+            throw new IllegalArgumentException("Password cannot be null");
+        }
 
         if(playerRepository.existsPlayerByEmail(registerDTO.getEmail()) || playerRepository.existsPlayerByUsername(registerDTO.getUsername()))
         {
@@ -62,8 +63,8 @@ public class PlayerService {
             return playerRepository.save(player);
         }
     }
-    public Player loginPlayer(LoginDTO loginDTO) throws NoSuchAlgorithmException
-    {
+
+    public Player loginPlayer(LoginDTO loginDTO) throws NoSuchAlgorithmException {
         Player player = playerRepository.findPlayerByUsername(loginDTO.getUsername());
         if(player != null)
         {
@@ -78,6 +79,24 @@ public class PlayerService {
         return null;
     }
 
+    public boolean changePassword(String resetKey, String newPassword) throws NoSuchAlgorithmException {
+        // Find the player with the given reset key
+        Player player = playerRepository.findPlayerByResetKey(resetKey);
+        if (player != null) {
+            // Hash the new password
+            String encryptedPassword = hashPassword(newPassword);
+            // Update the player's password
+            player.setPassword(encryptedPassword);
+            // Delete the reset key
+            player.setResetKey(null);
+            playerRepository.save(player);
+            return true;
+        } else {
+            // No player found with the given reset key
+            return false;
+        }
+    }
+
     private String hashPassword(String password) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         byte[] hash = md.digest(password.getBytes());
@@ -88,24 +107,19 @@ public class PlayerService {
         }
         return sb.toString();
     }
+
     private String generateSessionKey() {
         return UUID.randomUUID().toString();
     }
 
-
-    private String generateRandomToken() {
-        byte[] token = new byte[TOKEN_LENGTH];
-        SecureRandom secureRandom = new SecureRandom();
-        secureRandom.nextBytes(token);
-        return token.toString();
-    }
     public boolean sendEmail(String email) {
-        String token = generateRandomToken();
-        String resetLink = "https://example.com/reset-password?token=" + token;
+        LOGGER.info("sendEmail called with email: " + email);
+        String resetKey = generateSessionKey();
+        String resetLink = "http://localhost:8080/swagger-ui/index.html#/players/change-password";
         Player player = playerRepository.findPlayerByEmail(email);
 
         if (player != null) {
-            player.setResetToken(token);
+            player.setResetKey(resetKey);
             playerRepository.save(player);
             // Configure SMTP properties
             Properties properties = new Properties();
@@ -129,15 +143,18 @@ public class PlayerService {
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
                 message.setSubject("Password Reset");
                 message.setText("Dear user,\n\nPlease click on the following link to reset your password: "
-                        + resetLink);
+                        + resetLink + "\n\nYour reset key is: " + resetKey);
                 // Send the email
                 Transport.send(message);
+                LOGGER.info("Email sent to " + email);
                 return true;
             } catch (MessagingException e) {
+                LOGGER.severe("Error sending email: " + e.getMessage());
                 e.printStackTrace();
                 return false;
             }
         }
+        LOGGER.warning("Player not found for email " + email);
         return false;
     }
 
