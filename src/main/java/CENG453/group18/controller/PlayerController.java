@@ -80,4 +80,21 @@ public class PlayerController {
         }
         return ResponseEntity.ok(p);
     }
+
+
+    @Operation(summary = "Send email with reset link", tags = { "players", "post" })
+    @PostMapping("/reset-password")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Email sent"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<String> sendResetPasswordEmail(@RequestBody String email) {
+        // Send the email
+        boolean emailSent = playerService.sendEmail(email);
+        if (emailSent) {
+            return ResponseEntity.ok("Email sent");
+        } else {
+            return ResponseEntity.status(500).body("");
+        }
+    }
 }
