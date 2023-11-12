@@ -9,4 +9,4 @@
 
 ### Render Page
 [https://app-6i6b.onrender.com](https://app-6i6b.onrender.com) <br>
-For accessing Swagger-UI on the render page: [https://app-6i6b.onrender.com/api-ui](https://app-6i6b.onrender.com/api-ui)
+For accessing Swagger-UI on the render page: [https://app-6i6b.onrender.com/swagger-ui/index.html#/](https://app-6i6b.onrender.com/swagger-ui/index.html#/)
