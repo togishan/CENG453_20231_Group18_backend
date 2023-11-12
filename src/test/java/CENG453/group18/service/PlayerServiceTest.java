@@ -59,9 +59,6 @@ public class PlayerServiceTest
     @Test
     @Order(2)
     void testLoginWithCorrectCredentialsAndSetSessionKey() throws NoSuchAlgorithmException {
-
-
-
         LoginDTO correctLoginDTO1 = new LoginDTO("oguzhan","123");
         LoginDTO correctLoginDTO2 = new LoginDTO("oguzhan2","321");
 
