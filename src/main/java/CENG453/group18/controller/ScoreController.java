@@ -23,18 +23,6 @@ import java.util.List;
 public class ScoreController {
     @Autowired private ScoreService scoreService;
 
-
-    @Operation(summary = "Saves score to table, the date is not have to be today's date" , tags = { "scores", "post" })
-    @PostMapping("/adjustDate")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", content = {
-                    @Content(schema = @Schema(implementation = Score.class), mediaType = "application/json") }),
-    })
-    public ResponseEntity<Score> saveByAdjustingDate(String username, int playerScore, LocalDate date)
-    {
-        return ResponseEntity.ok(scoreService.saveScoreByAdjustingDate(username, playerScore, date));
-    }
-
     @Operation(summary = "Saves score to table" , tags = { "scores", "post" })
     @PostMapping
     @ApiResponses({

@@ -132,7 +132,7 @@ public class PlayerService {
             Session session = Session.getInstance(properties, new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication("celal8265@gmail.com", "ndxn ciye pxib vlcr");
+                    return new PasswordAuthentication("groupkatan18@gmail.com", "khks mmhw rjpq bnlp");
                 }
             });
 

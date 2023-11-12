@@ -9,8 +9,7 @@ public interface PlayerRepository extends JpaRepository<Player, Long>{
     Player findPlayerByUsername(String username);
     Player findPlayerByEmail(String email);
     Player findPlayerBySessionKey(String sessionKey);
-    Player findPlayerByResetKey(String resetToken);
+    Player findPlayerByResetKey(String resetKey);
     boolean existsPlayerByUsername(String username);
     boolean existsPlayerByEmail(String email);
-    void deleteByUsername(String username);
 }

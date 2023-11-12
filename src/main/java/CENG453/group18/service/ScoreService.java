@@ -22,6 +22,7 @@ public class ScoreService {
     @Autowired
     private PlayerRepository playerRepository;
 
+    // For only testing purposes
     public Score saveScoreByAdjustingDate(String username, int playerScore, LocalDate date)
     {
         Player player = playerRepository.findPlayerByUsername(username);
@@ -55,11 +56,10 @@ public class ScoreService {
             return null;
         }
     }
-
-    public List<ScoreDTO> getLastMonthScores()
+    public List<ScoreDTO> getLastWeekScores()
     {
         LocalDate date = LocalDate.now();
-        List<Score> scores = scoreRepository.findScoresByCreationDateAfterOrderByScoreDesc(date.minusDays(30));
+        List<Score> scores = scoreRepository.findScoresByCreationDateAfterOrderByScoreDesc(date.minusDays(7));
         List<ScoreDTO> scoreDTOS = new ArrayList<>();
         for(int i=0;i<scores.size();i++)
         {
@@ -68,10 +68,11 @@ public class ScoreService {
         }
         return scoreDTOS;
     }
-    public List<ScoreDTO> getLastWeekScores()
+
+    public List<ScoreDTO> getLastMonthScores()
     {
         LocalDate date = LocalDate.now();
-        List<Score> scores = scoreRepository.findScoresByCreationDateAfterOrderByScoreDesc(date.minusDays(7));
+        List<Score> scores = scoreRepository.findScoresByCreationDateAfterOrderByScoreDesc(date.minusDays(30));
         List<ScoreDTO> scoreDTOS = new ArrayList<>();
         for(int i=0;i<scores.size();i++)
         {

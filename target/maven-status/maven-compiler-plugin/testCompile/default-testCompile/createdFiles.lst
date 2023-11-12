@@ -1,3 +1,6 @@
-CENG453/group18/entity/ScoreTest.class
-CENG453/group18/AppApplicationTests.class
-CENG453/group18/entity/PlayerTest.class
+CENG453\group18\entity\ScoreTest.class
+CENG453\group18\repository\PlayerRepositoryTest.class
+CENG453\group18\service\ScoreServiceTest.class
+CENG453\group18\AppApplicationTests.class
+CENG453\group18\repository\ScoreRepositoryTest.class
+CENG453\group18\entity\PlayerTest.class

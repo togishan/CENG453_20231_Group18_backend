@@ -36,14 +36,7 @@ public class Player {
         A score can only belong to the single player
      */
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL ,fetch = FetchType.LAZY)
-    private List<Score> scores = new ArrayList<>();
 
-    @JsonManagedReference
-    public List<Score> getScores()
-    {
-        return scores;
-    }
     @Override
     public boolean equals(Object obj)
     {

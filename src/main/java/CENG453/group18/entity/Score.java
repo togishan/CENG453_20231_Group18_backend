@@ -28,15 +28,15 @@ public class Score {
     private Integer score;
     @Column(name= "creation_date", nullable = false)
     private LocalDate creationDate;
-
     /*
         A player can have multiple scores,
         A score can only belong to the single player
      */
-
     @ManyToOne
     @JoinColumn(name = "player_id")
     private Player owner;
+
+
     @JsonBackReference
     public Player getOwner()
     {
