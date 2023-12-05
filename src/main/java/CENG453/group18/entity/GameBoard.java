@@ -125,12 +125,35 @@ public class GameBoard {
         }
     }
 
-    // Check whether the node is appropriate for a player to place a settlement on this node
+    // Check whether the node is appropriate for a player to place a settlement on
     public boolean isSettlementPlacementAppropriate(int nodeIndex, int playerNo)
     {
-
-
+        // todo
         return true;
+    }
+    // Check whether the edge is appropriate for a player to place a road on
+    public boolean isRoadPlacementAppropriate(int edgeIndex, int playerNo)
+    {
+        // todo
+        return true;
+    }
+
+    public void addSettlement(int nodeIndex, int playerNo)
+    {
+        // todo
+    }
+    public void addRoad(int edgeIndex, int playerNo)
+    {
+        // todo
+    }
+    public void upgradeSettlement(int nodeIndex)
+    {
+        // todo
+    }
+    public Integer findLongestRoadLengthOfPlayer(int playerNo)
+    {
+        // todo
+        return 0;
     }
 
     @Override
