@@ -1,6 +1,8 @@
 package CENG453.group18.entity;
 
+import CENG453.group18.dictionary.EdgeDictionaryObject;
 import CENG453.group18.dictionary.GameBoardDictionary;
+import CENG453.group18.dictionary.NodeDictionaryObject;
 import CENG453.group18.enums.TileType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -128,27 +130,131 @@ public class GameBoard {
     // Check whether the node is appropriate for a player to place a settlement on
     public boolean isSettlementPlacementAppropriate(int nodeIndex, int playerNo)
     {
-        // todo
+        NodeDictionaryObject node = gameBoardDictionary.getNode(nodeIndex);
+
+        // check whether the settlement is between at least 2 roads belong to the same player who calls this function
+        int adjacentRoadCount = 0;
+        for (int i=0; i<node.getAdjacentEdges().size(); i++)
+        {
+            Road temp = new Road();
+            temp.setEdgeIndex(node.getAdjacentEdges().get(i));
+            temp.setPlayerNo(playerNo);
+            if(roads.contains(temp))
+            {
+                adjacentRoadCount++;
+            }
+        }
+        if(adjacentRoadCount<2)
+        {
+            return false;
+        }
+
+        // check whether there exists any settlement in the node
+        for(Settlement settlement: settlements) {
+            if(settlement.getNodeIndex() == nodeIndex)
+            {
+                return false;
+            }
+            // check whether there exist any settlements in adjacent nodes
+            for (int i=0; i<node.getAdjacentNodes().size(); i++)
+            {
+                if(node.getAdjacentNodes().get(i) == settlement.getNodeIndex())
+                {
+                    return false;
+                }
+            }
+        }
         return true;
     }
     // Check whether the edge is appropriate for a player to place a road on
     public boolean isRoadPlacementAppropriate(int edgeIndex, int playerNo)
     {
-        // todo
-        return true;
+        EdgeDictionaryObject edgeDictionaryObject = gameBoardDictionary.getEdge(edgeIndex);
+
+        // check whether there exists a road already placed in an edge with edgeIndex
+        for (Road road : roads) {
+            if (road.getEdgeIndex() == edgeIndex) {
+                return false;
+            }
+        }
+        // check whether there exists a settlement which belongs to the player adjacent to the edge with edgeIndex
+        // if not found, check for adjacent edges to check if any road belongs to the same player exists
+        Integer node1_index = edgeDictionaryObject.getNode1_index();
+        Integer node2_index = edgeDictionaryObject.getNode2_index();
+
+        Settlement temp1 = new Settlement();
+        Settlement temp2 = new Settlement();
+
+        temp1.setNodeIndex(node1_index);
+        temp2.setNodeIndex(node2_index);
+
+        temp1.setPlayerNo(playerNo);
+        temp2.setPlayerNo(playerNo);
+
+        if(settlements.contains(temp1) || settlements.contains(temp2))
+        {
+            return true;
+        }
+
+        // not found, check adjacent road exists
+        NodeDictionaryObject nodeDictionaryObject1 = gameBoardDictionary.getNode(node1_index);
+        for (int i=0; i<nodeDictionaryObject1.getAdjacentEdges().size(); i++)
+        {
+            Road temp = new Road();
+            temp.setEdgeIndex(nodeDictionaryObject1.getAdjacentEdges().get(i));
+            temp.setPlayerNo(playerNo);
+            if(roads.contains(temp))
+            {
+                return true;
+            }
+        }
+        NodeDictionaryObject nodeDictionaryObject2 = gameBoardDictionary.getNode(node2_index);
+        for (int i=0; i<nodeDictionaryObject2.getAdjacentEdges().size(); i++)
+        {
+            Road temp = new Road();
+            temp.setEdgeIndex(nodeDictionaryObject2.getAdjacentEdges().get(i));
+            temp.setPlayerNo(playerNo);
+            if(roads.contains(temp))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void addSettlement(int nodeIndex, int playerNo)
     {
-        // todo
+        if(isSettlementPlacementAppropriate(nodeIndex, playerNo))
+        {
+            Settlement settlement = new Settlement();
+            settlement.setNodeIndex(nodeIndex);
+            settlement.setPlayerNo(playerNo);
+            settlement.setSettlementLevel(1);
+            settlements.add(settlement);
+        }
     }
     public void addRoad(int edgeIndex, int playerNo)
     {
-        // todo
+        if(isRoadPlacementAppropriate(edgeIndex, playerNo))
+        {
+            Road road = new Road();
+            road.setEdgeIndex(edgeIndex);
+            road.setPlayerNo(playerNo);
+            roads.add(road);
+        }
     }
-    public void upgradeSettlement(int nodeIndex)
+    public void upgradeSettlement(int nodeIndex, int playerNo)
     {
-        // todo
+        // check whether settlement belongs to the player and whether it is already upgraded
+        Settlement temp = new Settlement();
+        temp.setNodeIndex(nodeIndex);
+        temp.setPlayerNo(playerNo);
+        temp.setSettlementLevel(2);
+        int index = settlements.indexOf(temp);
+        if (index!=-1 && settlements.get(index).getSettlementLevel() == 1)
+        {
+            settlements.set(index, temp);
+        }
     }
     public Integer findLongestRoadLengthOfPlayer(int playerNo)
     {

@@ -1,5 +1,6 @@
 package CENG453.group18.dictionary;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
@@ -360,4 +361,13 @@ public class GameBoardDictionary {
         edges.put(71, new EdgeDictionaryObject(50,53));
     }
 
+    public NodeDictionaryObject getNode(int index)
+    {
+        return nodes.get(index);
+    }
+
+    public EdgeDictionaryObject getEdge(int index)
+    {
+        return edges.get(index);
+    }
 }

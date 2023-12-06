@@ -28,8 +28,18 @@ public class Road {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "game_id")
+    @JoinColumn(name = "gameBoard_id")
     private GameBoard owner;
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if(obj instanceof Road road)
+        {
+            return this.getEdgeIndex() == road.getEdgeIndex() && this.getPlayerNo() == road.getPlayerNo();
+        }
+        return false;
+    }
 
 
 }

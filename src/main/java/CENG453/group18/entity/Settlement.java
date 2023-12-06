@@ -29,6 +29,16 @@ public class Settlement {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "game_id")
+    @JoinColumn(name = "gameBoard_id")
     private GameBoard owner;
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if(obj instanceof Settlement settlement)
+        {
+            return this.getNodeIndex() == settlement.getNodeIndex() && this.getPlayerNo() == settlement.getPlayerNo();
+        }
+        return false;
+    }
 }

@@ -29,6 +29,6 @@ public class Tile
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "game_id")
+    @JoinColumn(name = "gameBoard_id")
     private GameBoard owner;
 }
