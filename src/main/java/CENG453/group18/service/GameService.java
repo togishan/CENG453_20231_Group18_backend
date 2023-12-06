@@ -23,9 +23,7 @@ public class GameService {
     public Game createGame()
     {
         Game game = new Game();
-        GameBoard gameBoard = new GameBoard();
-        gameBoardRepository.save(gameBoard);
-        game.setGameboard(gameBoard);
+        gameBoardRepository.save(game.getGameboard());
         return gameRepository.save(game);
     }
 

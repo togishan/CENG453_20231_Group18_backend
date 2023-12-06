@@ -35,12 +35,18 @@ public class GameBoard {
     @Transient
     private static final GameBoardDictionary gameBoardDictionary = new GameBoardDictionary();
 
-
+    // Stores all node and their adjacent nodes' indices
+    // For any new settlement these indices are not valid to place
+    @ElementCollection
+    @CollectionTable(name = "FORBIDDEN_NODE_INDICES", joinColumns = @JoinColumn(name = "gameboard_id"))
+    @Column(name = "node_index")
+    private Set<Integer> forbiddenNodeIndices = new HashSet<>();
     /*
     * Initialize the game board with random tile placements and random dice
     * number assignments.   */
     public GameBoard()
     {
+        forbiddenNodeIndices = new HashSet<>();
         addTileTypes();
         addTileNumbers();
         addInitialSettlements();
@@ -132,26 +138,25 @@ public class GameBoard {
     private void addInitialSettlements()
     {
         Random rand = new Random();
-
-        // pick a random index from 0 to 54 and create a settlement for the players by checking conflicts
-        for(int i=0; i<4; i++) {
+        for(int i=0; i<4; i++)
+        {
             int nodeIndex = rand.nextInt(54);
-            // check for all settlements added before
-            for (Settlement settlementIter : settlements) {
-                NodeDictionaryObject nodeDictionaryObject = gameBoardDictionary.getNode(settlementIter.getNodeIndex());
-                // check whether node itself or adjacent nodes are occupied
-                while(settlementIter.getNodeIndex() == nodeIndex || nodeDictionaryObject.getAdjacentNodes().contains(nodeIndex)) {
-                    if (nodeIndex < 54) {
-                        nodeIndex++;
-                    }
-                    else {
-                        nodeIndex = 0;
-                    }
+            while(forbiddenNodeIndices.contains(nodeIndex))
+            {
+                if (nodeIndex < 53)
+                {
+                    nodeIndex++;
+                }
+                else
+                {
+                    nodeIndex = 0;
                 }
             }
+            forbiddenNodeIndices.add(nodeIndex);
+            forbiddenNodeIndices.addAll(gameBoardDictionary.getNode(nodeIndex).getAdjacentNodes());
             Settlement settlement = new Settlement();
-            settlement.setNodeIndex(nodeIndex);
             settlement.setSettlementLevel(1);
+            settlement.setNodeIndex(nodeIndex);
             settlement.setPlayerNo(i+1);
             settlements.add(settlement);
         }
@@ -194,20 +199,10 @@ public class GameBoard {
             return false;
         }
 
-        // check whether there exists any settlement in the node
-        for(Settlement settlement: settlements) {
-            if(settlement.getNodeIndex() == nodeIndex)
-            {
-                return false;
-            }
-            // check whether there exist any settlements in adjacent nodes
-            for (int i=0; i<node.getAdjacentNodes().size(); i++)
-            {
-                if(node.getAdjacentNodes().get(i) == settlement.getNodeIndex())
-                {
-                    return false;
-                }
-            }
+        // check whether there exists any settlement in the node and adjacent nodes
+        if(forbiddenNodeIndices.contains(nodeIndex))
+        {
+            return false;
         }
         return true;
     }
@@ -271,6 +266,9 @@ public class GameBoard {
     {
         if(isSettlementPlacementAppropriate(nodeIndex, playerNo))
         {
+            forbiddenNodeIndices.add(nodeIndex);
+            forbiddenNodeIndices.addAll(gameBoardDictionary.getNode(nodeIndex).getAdjacentNodes());
+
             Settlement settlement = new Settlement();
             settlement.setNodeIndex(nodeIndex);
             settlement.setPlayerNo(playerNo);
