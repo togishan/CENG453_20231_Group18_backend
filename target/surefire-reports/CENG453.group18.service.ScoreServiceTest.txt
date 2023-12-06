@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: CENG453.group18.service.ScoreServiceTest
 -------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.177 s - in CENG453.group18.service.ScoreServiceTest
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.209 s - in CENG453.group18.service.ScoreServiceTest

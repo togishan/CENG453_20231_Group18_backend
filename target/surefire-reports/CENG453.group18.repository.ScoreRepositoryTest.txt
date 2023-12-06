@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: CENG453.group18.repository.ScoreRepositoryTest
 -------------------------------------------------------------------------------
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.109 s - in CENG453.group18.repository.ScoreRepositoryTest
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.103 s - in CENG453.group18.repository.ScoreRepositoryTest
