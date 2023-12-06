@@ -43,6 +43,8 @@ public class GameBoard {
     {
         addTileTypes();
         addTileNumbers();
+        addInitialSettlements();
+        addInitialRoads();
     }
 
     private void addTileTypes()
@@ -124,6 +126,45 @@ public class GameBoard {
             }
             numberCounts.set(currentIndex, numberCounts.get(currentIndex)-1);
             tiles.get(i).setTileNumber(currentIndex + 2);
+        }
+    }
+
+    private void addInitialSettlements()
+    {
+        Random rand = new Random();
+
+        // pick a random index from 0 to 54 and create a settlement for the players by checking conflicts
+        for(int i=0; i<4; i++) {
+            int nodeIndex = rand.nextInt(54);
+            // check for all settlements added before
+            for (Settlement settlementIter : settlements) {
+                NodeDictionaryObject nodeDictionaryObject = gameBoardDictionary.getNode(nodeIndex);
+                // check whether node itself or adjacent nodes are occupied
+                while(settlementIter.getNodeIndex() == nodeIndex || nodeDictionaryObject.getAdjacentNodes().contains(settlementIter.getNodeIndex()))
+                {
+                    nodeIndex = rand.nextInt(54);
+                }
+            }
+            Settlement settlement = new Settlement();
+            settlement.setNodeIndex(nodeIndex);
+            settlement.setSettlementLevel(1);
+            settlement.setPlayerNo(i+1);
+            settlements.add(settlement);
+        }
+    }
+    private void addInitialRoads()
+    {
+        Random rand = new Random();
+        int i=1;
+        for(Settlement settlement: settlements)
+        {
+            NodeDictionaryObject nodeDictionaryObject = gameBoardDictionary.getNode(settlement.getNodeIndex());
+            Road road = new Road();
+            road.setPlayerNo(i);
+            int edgeIndex = nodeDictionaryObject.getAdjacentEdges().get(rand.nextInt(nodeDictionaryObject.getAdjacentEdges().size()));
+            road.setEdgeIndex(edgeIndex);
+            i++;
+            roads.add(road);
         }
     }
 
@@ -222,7 +263,7 @@ public class GameBoard {
         return false;
     }
 
-    public void addSettlement(int nodeIndex, int playerNo)
+    public Settlement addSettlement(int nodeIndex, int playerNo)
     {
         if(isSettlementPlacementAppropriate(nodeIndex, playerNo))
         {
@@ -231,9 +272,11 @@ public class GameBoard {
             settlement.setPlayerNo(playerNo);
             settlement.setSettlementLevel(1);
             settlements.add(settlement);
+            return settlement;
         }
+        return null;
     }
-    public void addRoad(int edgeIndex, int playerNo)
+    public Road addRoad(int edgeIndex, int playerNo)
     {
         if(isRoadPlacementAppropriate(edgeIndex, playerNo))
         {
@@ -241,9 +284,11 @@ public class GameBoard {
             road.setEdgeIndex(edgeIndex);
             road.setPlayerNo(playerNo);
             roads.add(road);
+            return road;
         }
+        return null;
     }
-    public void upgradeSettlement(int nodeIndex, int playerNo)
+    public Settlement upgradeSettlement(int nodeIndex, int playerNo)
     {
         // check whether settlement belongs to the player and whether it is already upgraded
         Settlement temp = new Settlement();
@@ -254,7 +299,9 @@ public class GameBoard {
         if (index!=-1 && settlements.get(index).getSettlementLevel() == 1)
         {
             settlements.set(index, temp);
+            return temp;
         }
+        return null;
     }
     public Integer findLongestRoadLengthOfPlayer(int playerNo)
     {

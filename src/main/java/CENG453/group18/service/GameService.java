@@ -2,6 +2,8 @@ package CENG453.group18.service;
 
 import CENG453.group18.entity.Game;
 import CENG453.group18.entity.GameBoard;
+import CENG453.group18.entity.Road;
+import CENG453.group18.entity.Settlement;
 import CENG453.group18.repository.GameBoardRepository;
 import CENG453.group18.repository.GameRepository;
 import jakarta.transaction.Transactional;
@@ -46,7 +48,34 @@ public class GameService {
         }
     }
 
-
-
-
+    @Transactional
+    public Settlement addSettlement(int gameID, int nodeIndex, int playerNo)
+    {
+        Game game = gameRepository.getGameByGameID(gameID);
+        if(game == null)
+        {
+            return null;
+        }
+        return gameRepository.getGameByGameID(gameID).getGameboard().addSettlement(nodeIndex, playerNo);
+    }
+    @Transactional
+    public Road addRoad(int gameID, int edgeIndex, int playerNo)
+    {
+        Game game = gameRepository.getGameByGameID(gameID);
+        if(game == null)
+        {
+            return null;
+        }
+        return gameRepository.getGameByGameID(gameID).getGameboard().addRoad(edgeIndex, playerNo);
+    }
+    @Transactional
+    public Settlement upgradeSettlement(int gameID, int nodeIndex, int playerNo)
+    {
+        Game game = gameRepository.getGameByGameID(gameID);
+        if(game == null)
+        {
+            return null;
+        }
+        return gameRepository.getGameByGameID(gameID).getGameboard().upgradeSettlement(nodeIndex, playerNo);
+    }
 }

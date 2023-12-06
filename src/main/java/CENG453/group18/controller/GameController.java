@@ -1,6 +1,8 @@
 package CENG453.group18.controller;
 
 import CENG453.group18.entity.Game;
+import CENG453.group18.entity.Road;
+import CENG453.group18.entity.Settlement;
 import CENG453.group18.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,8 +12,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpServerErrorException;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/game")
@@ -62,6 +67,74 @@ public class GameController {
             return ResponseEntity.status(500).body(false);  // Deletion failed
         }
     }
-
+    @Operation(summary = "Add settlement to the gameboard", tags = { "game", "addSettlement" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {
+                    @Content(schema = @Schema(implementation = Settlement.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "204", description = "Placement is not appropriate" ),
+    })
+    @PostMapping("/addSettlement")
+    public ResponseEntity<Settlement> addSettlement(int gameID, int nodeIndex, int playerNo)
+    {
+        try {
+            Settlement settlement = gameService.addSettlement(gameID, nodeIndex, playerNo);
+            if(settlement != null)
+            {
+                return ResponseEntity.ok(settlement);
+            }
+            else
+            {
+                return ResponseEntity.status(204).body(null);
+            }
+        }catch (HttpServerErrorException.InternalServerError e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+    @Operation(summary = "Add road to the gameboard", tags = { "game", "addRoad" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {
+                    @Content(schema = @Schema(implementation = Settlement.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "204", description = "Placement is not appropriate" ),
+    })
+    @PostMapping("/addRoad")
+    public ResponseEntity<Road> addRoad(int gameID, int edgeIndex, int playerNo)
+    {
+        try {
+            Road road = gameService.addRoad(gameID, edgeIndex, playerNo);
+            if(road != null)
+            {
+                return ResponseEntity.ok(road);
+            }
+            else
+            {
+                return ResponseEntity.status(204).body(null);
+            }
+        }catch (HttpServerErrorException.InternalServerError e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+    @Operation(summary = "Upgrade a settlement from level 1 to level 2", tags = { "game", "upgradeSettlement" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {
+                    @Content(schema = @Schema(implementation = Settlement.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "204", description = "Upgrade is not appropriate" ),
+    })
+    @PostMapping("/upgradeSettlement")
+    public ResponseEntity<Settlement> upgradeSettlement(int gameID, int nodeIndex, int playerNo)
+    {
+        try {
+            Settlement settlement = gameService.upgradeSettlement(gameID, nodeIndex, playerNo);
+            if(settlement != null)
+            {
+                return ResponseEntity.ok(settlement);
+            }
+            else
+            {
+                return ResponseEntity.status(204).body(null);
+            }
+        }catch (HttpServerErrorException.InternalServerError e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
 
 }
