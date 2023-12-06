@@ -138,11 +138,15 @@ public class GameBoard {
             int nodeIndex = rand.nextInt(54);
             // check for all settlements added before
             for (Settlement settlementIter : settlements) {
-                NodeDictionaryObject nodeDictionaryObject = gameBoardDictionary.getNode(nodeIndex);
+                NodeDictionaryObject nodeDictionaryObject = gameBoardDictionary.getNode(settlementIter.getNodeIndex());
                 // check whether node itself or adjacent nodes are occupied
-                while(settlementIter.getNodeIndex() == nodeIndex || nodeDictionaryObject.getAdjacentNodes().contains(settlementIter.getNodeIndex()))
-                {
-                    nodeIndex = rand.nextInt(54);
+                while(settlementIter.getNodeIndex() == nodeIndex || nodeDictionaryObject.getAdjacentNodes().contains(nodeIndex)) {
+                    if (nodeIndex < 54) {
+                        nodeIndex++;
+                    }
+                    else {
+                        nodeIndex = 0;
+                    }
                 }
             }
             Settlement settlement = new Settlement();

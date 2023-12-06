@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class GameService {
@@ -56,7 +57,8 @@ public class GameService {
         {
             return null;
         }
-        return gameRepository.getGameByGameID(gameID).getGameboard().addSettlement(nodeIndex, playerNo);
+        Settlement settlement = gameRepository.getGameByGameID(gameID).getGameboard().addSettlement(nodeIndex, playerNo);
+        return settlement;
     }
     @Transactional
     public Road addRoad(int gameID, int edgeIndex, int playerNo)
@@ -66,7 +68,8 @@ public class GameService {
         {
             return null;
         }
-        return gameRepository.getGameByGameID(gameID).getGameboard().addRoad(edgeIndex, playerNo);
+        Road road = gameRepository.getGameByGameID(gameID).getGameboard().addRoad(edgeIndex, playerNo);
+        return road;
     }
     @Transactional
     public Settlement upgradeSettlement(int gameID, int nodeIndex, int playerNo)
@@ -76,6 +79,7 @@ public class GameService {
         {
             return null;
         }
-        return gameRepository.getGameByGameID(gameID).getGameboard().upgradeSettlement(nodeIndex, playerNo);
+        Settlement settlement = gameRepository.getGameByGameID(gameID).getGameboard().upgradeSettlement(nodeIndex, playerNo);
+        return settlement;
     }
 }
