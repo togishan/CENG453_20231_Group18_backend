@@ -301,10 +301,11 @@ public class GameBoard {
         if (index!=-1 && settlements.get(index).getSettlementLevel() == 1)
         {
             settlements.get(index).setSettlementLevel(2);
-            return temp;
+            return  settlements.get(index);
         }
         return null;
     }
+    // find the longest path belongs to the player
     public Integer findLongestRoadLengthOfPlayer(int playerNo)
     {
         // todo
