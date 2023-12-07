@@ -9,6 +9,7 @@ import CENG453.group18.repository.GameRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.util.List;
 import java.util.Set;
@@ -80,4 +81,26 @@ public class GameService {
         Settlement settlement = gameRepository.getGameByGameID(gameID).getGameboard().upgradeSettlement(nodeIndex, playerNo);
         return settlement;
     }
+
+    @Transactional
+    public Integer rollTheDice(int gameID)
+    {
+        return gameRepository.getGameByGameID(gameID).rollTheDice();
+    }
+
+    @Transactional
+    public void botPlay(int gameID, int playerNo)
+    {
+        // bot plays its turn and ends it
+        rollTheDice(gameID);
+        gameRepository.getGameByGameID(gameID).botPlay(playerNo);
+        endTurn(gameID);
+    }
+
+    @Transactional
+    public Integer endTurn(int gameID) throws NullPointerException
+    {
+        return gameRepository.getGameByGameID(gameID).endTurn();
+    }
+
 }

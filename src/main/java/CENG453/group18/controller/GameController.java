@@ -136,5 +136,62 @@ public class GameController {
             return ResponseEntity.status(500).body(null);
         }
     }
+    @Operation(summary = "Assigns random number ranging from 2 to 12 to the dice", tags = { "game", "rollTheDice" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200" ),
+            @ApiResponse(responseCode = "204", description = "No record with that id"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/rollTheDice")
+    public ResponseEntity<Integer> rollTheDice(int gameID)
+    {
+        try {
+            return ResponseEntity.ok(gameService.rollTheDice(gameID));
+        }catch (NullPointerException e) {
+            return ResponseEntity.status(204).body(null);
+        }
+        catch (HttpServerErrorException.InternalServerError e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @Operation(summary = "Bot plays its turn", tags = { "game", "botPlay" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200" ),
+            @ApiResponse(responseCode = "204", description = "No record with that id"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/botPlay")
+    public ResponseEntity<Boolean> botPlay(int gameID, int playerNo)
+    {
+        try {
+            gameService.botPlay(gameID, playerNo);
+            return ResponseEntity.ok(true);
+        }catch (NullPointerException e) {
+            return ResponseEntity.status(204).body(false);
+        }
+        catch (HttpServerErrorException.InternalServerError e) {
+            return ResponseEntity.status(500).body(false);
+        }
+    }
+
+    @Operation(summary = "Ends the turn", tags = { "game", "endTurn" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200" ),
+            @ApiResponse(responseCode = "204", description = "No record with that id"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/endTurn")
+    public ResponseEntity<Integer> endTurn(int gameID)
+    {
+        try {
+            return ResponseEntity.ok(gameService.endTurn(gameID));
+        }catch (NullPointerException e) {
+            return ResponseEntity.status(204).body(null);
+        }
+        catch (HttpServerErrorException.InternalServerError e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
 
 }

@@ -22,6 +22,7 @@ public class GameBoard {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    // once the gameboard is deleted delete all game components from the database
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Settlement> settlements = new ArrayList<>();
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
