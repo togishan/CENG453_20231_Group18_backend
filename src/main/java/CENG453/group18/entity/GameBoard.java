@@ -300,7 +300,7 @@ public class GameBoard {
         int index = settlements.indexOf(temp);
         if (index!=-1 && settlements.get(index).getSettlementLevel() == 1)
         {
-            settlements.set(index, temp);
+            settlements.get(index).setSettlementLevel(2);
             return temp;
         }
         return null;
