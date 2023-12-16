@@ -113,7 +113,7 @@ public class GameBoard {
         // index-3: # of 5s, index-4: # of 6s, index-5: # of 7s and so on
 
         ArrayList<Integer> numberCounts = new ArrayList<Integer>(
-                Arrays.asList(1,1,2,2,2,2,2,2,2,1,1));
+                Arrays.asList(1,2,2,2,2,0,2,2,2,2,1));
         Random rand = new Random();
         int currentIndex;
         for(int i = 0; i < 19; i++)
@@ -309,8 +309,61 @@ public class GameBoard {
     // find the longest path belongs to the player
     public Integer findLongestRoadLengthOfPlayer(int playerNo)
     {
-        // todo
-        return 0;
+        int maxLength = 0;
+        for(int i=0; i<roads.size(); i++)
+        {
+            // apply traversal algorithm for each road that player has
+            if(roads.get(i).getPlayerNo() == playerNo)
+            {
+                EdgeDictionaryObject edgeDictionaryObject = gameBoardDictionary.getEdge(roads.get(i).getEdgeIndex());
+                Set<Integer> set1 = new HashSet<>();
+                Set<Integer> set2 = new HashSet<>();
+                int length1 = traverseRoad(playerNo, edgeDictionaryObject.getNode1_index(), set1);
+                int length2 = traverseRoad(playerNo, edgeDictionaryObject.getNode2_index(), set2);
+                length1 = Math.max(length1, length2);
+                maxLength = Math.max(length1, maxLength);
+            }
+        }
+        return maxLength;
+    }
+
+    // Helper for findLongestRoadLengthOfPlayer
+    // Recursively traverse edges and find maximum length without passing through the same road again
+    private Integer traverseRoad(int playerNo, int currentNodeIndex, Set<Integer> alreadyTraversedEdgeIndices)
+    {
+        NodeDictionaryObject nodeDictionaryObject = gameBoardDictionary.getNode(currentNodeIndex);
+        List<Integer> edgeIndices = nodeDictionaryObject.getAdjacentEdges();
+        int maxLength = 0;
+        for(int i=0; i<edgeIndices.size(); i++)
+        {
+            // check if the edge is already traversed
+            if(alreadyTraversedEdgeIndices.contains(edgeIndices.get(i)))
+            {
+                continue;
+            }
+            // check if the player build a road on this edge
+            Road road = new Road();
+            road.setEdgeIndex(edgeIndices.get(i));
+            road.setPlayerNo(playerNo);
+
+            if(roads.contains(road))
+            {
+                // create a new set and add the next traversed edge to the set
+                Set<Integer> temp = alreadyTraversedEdgeIndices;
+                temp.add(edgeIndices.get(i));
+                // get the next node index
+                EdgeDictionaryObject edgeDictionaryObject = gameBoardDictionary.getEdge(edgeIndices.get(i));
+                // pick the node index that is not equal to the current node index
+                int nextNodeIndex = edgeDictionaryObject.getNode1_index() != currentNodeIndex ? edgeDictionaryObject.getNode1_index() : edgeDictionaryObject.getNode2_index();
+                int nextMaxPathLength = traverseRoad(playerNo, nextNodeIndex, temp);
+                if(maxLength < 1 + nextMaxPathLength)
+                {
+                    maxLength = 1 + nextMaxPathLength;
+                }
+            }
+
+        }
+        return maxLength;
     }
 
     @Override

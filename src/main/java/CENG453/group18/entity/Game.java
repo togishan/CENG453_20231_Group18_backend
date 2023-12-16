@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.antlr.v4.runtime.misc.Pair;
 import org.checkerframework.checker.units.qual.C;
 
 import java.util.ArrayList;
@@ -51,6 +52,11 @@ public class Game {
     // holds a single card deck for each player and each card deck holds multiple cards belonging to player
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlayerCardDeck> playerCardDeckList = new ArrayList<>();
+
+    @Column(name = "current_longest_road_length")
+    private Integer currentLongestRoadLength;
+    @Column(name = "current_longest_road_owner_playerNo")
+    private Integer currentLongestRoadOwnerPlayerNo;
 
 
     // Constructor must be changed by adding and attaching players and additional features
