@@ -43,7 +43,7 @@ public class Game {
 
     // SinglePlayer or Multiplayer
     @Column(name = "game_type")
-    private GameType gameType;
+    private GameType gameType = GameType.SinglePlayer; // default value
 
     @Column(name = "current_dice")
     private Integer currentDice;
@@ -62,6 +62,10 @@ public class Game {
         // implement distributeCards and add here
         // todo
 
+    }
+
+    public void setGameType(GameType gameType) {
+        this.gameType = gameType;
     }
 
 
