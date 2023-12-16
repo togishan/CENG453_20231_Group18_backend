@@ -103,6 +103,12 @@ public class GameService {
         return gameRepository.getGameByGameID(gameID).endTurn();
     }
 
+    @Transactional
+    public Boolean setLongestRoad_LongestRoadOwner(int gameID) throws NullPointerException
+    {
+        gameRepository.getGameByGameID(gameID).setLongestRoadInTheGame();
+        return true;
+    }
 
 
 }

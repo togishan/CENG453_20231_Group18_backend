@@ -193,5 +193,22 @@ public class GameController {
             return ResponseEntity.status(500).body(null);
         }
     }
-
+    @Operation(summary = "Sets the longest road length and longest road owner player no", tags = { "game", "setLongestRoad" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200" ),
+            @ApiResponse(responseCode = "204", description = "No record with that id"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/setLongestRoad")
+    public ResponseEntity<Boolean> setLongestRoad(int gameID)
+    {
+        try {
+            return ResponseEntity.ok(gameService.setLongestRoad_LongestRoadOwner(gameID));
+        }catch (NullPointerException e) {
+            return ResponseEntity.status(204).body(null);
+        }
+        catch (HttpServerErrorException.InternalServerError e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
 }

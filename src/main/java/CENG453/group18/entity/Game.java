@@ -114,4 +114,23 @@ public class Game {
     {
         // todo
     }
+
+    public void setLongestRoadInTheGame()
+    {
+        int tempCurrentLongestRoadLength = 0;
+        int tempCurrentLongestRoadOwnerPlayerNo = 0;
+        int tempLength = 0;
+        for(int i=1 ; i<5; i++)
+        {
+            tempLength = gameboard.findLongestRoadLengthOfPlayer(i);
+            if(tempLength > tempCurrentLongestRoadLength)
+            {
+                tempCurrentLongestRoadLength = tempLength;
+                tempCurrentLongestRoadOwnerPlayerNo = i;
+            }
+        }
+        currentLongestRoadLength = tempCurrentLongestRoadLength;
+        currentLongestRoadOwnerPlayerNo = tempCurrentLongestRoadOwnerPlayerNo;
+    }
+
 }
