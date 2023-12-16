@@ -8,6 +8,7 @@ import CENG453.group18.repository.GameBoardRepository;
 import CENG453.group18.repository.GameRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
 
@@ -21,9 +22,9 @@ public class GameService {
     @Autowired
     private GameBoardRepository gameBoardRepository;
     @Transactional
-    public Game createGame()
+    public Game createGame(int hostID)
     {
-        Game game = new Game();
+        Game game = new Game(hostID);
         gameBoardRepository.save(game.getGameboard());
         return gameRepository.save(game);
     }
@@ -48,19 +49,19 @@ public class GameService {
         }
     }
 
-    @Transactional
-    public Settlement addSettlement(int gameID, int nodeIndex, int playerNo)
+
+    private Settlement addSettlement(int gameID, int nodeIndex, int playerNo)
     {
         Game game = gameRepository.getGameByGameID(gameID);
-        if(game == null)
+        if(game == null )
         {
             return null;
         }
         Settlement settlement = gameRepository.getGameByGameID(gameID).getGameboard().addSettlement(nodeIndex, playerNo);
         return settlement;
     }
-    @Transactional
-    public Road addRoad(int gameID, int edgeIndex, int playerNo)
+
+    private Road addRoad(int gameID, int edgeIndex, int playerNo)
     {
         Game game = gameRepository.getGameByGameID(gameID);
         if(game == null)
@@ -70,8 +71,8 @@ public class GameService {
         Road road = gameRepository.getGameByGameID(gameID).getGameboard().addRoad(edgeIndex, playerNo);
         return road;
     }
-    @Transactional
-    public Settlement upgradeSettlement(int gameID, int nodeIndex, int playerNo)
+
+    private Settlement upgradeSettlement(int gameID, int nodeIndex, int playerNo)
     {
         Game game = gameRepository.getGameByGameID(gameID);
         if(game == null)
@@ -80,6 +81,60 @@ public class GameService {
         }
         Settlement settlement = gameRepository.getGameByGameID(gameID).getGameboard().upgradeSettlement(nodeIndex, playerNo);
         return settlement;
+    }
+
+    private Integer endTurn(int gameID) throws NullPointerException
+    {
+        return gameRepository.getGameByGameID(gameID).endTurn();
+    }
+    @Transactional
+    public Integer playerMove(int gameID, String moveType, int edgeOrNodeIndex, int playerNo)
+    {
+        Game game = gameRepository.getGameByGameID(gameID);
+        if(game.getTurn() != playerNo)
+        {
+            return -1;
+        }
+        switch (moveType)
+        {
+            case "addSettlement":
+                if(!game.areThereEnoughResources("settlement", playerNo))
+                {
+                    return -2;
+                }
+                if(null == addSettlement(gameID, edgeOrNodeIndex, playerNo))
+                {
+                    return -3;
+                }
+                game.consumeResourceCards("settlement", playerNo);
+                break;
+            case "addRoad":
+                if(!game.areThereEnoughResources("road", playerNo))
+                {
+                    return -2;
+                }
+                if(null == addRoad(gameID, edgeOrNodeIndex, playerNo))
+                {
+                    return -3;
+                }
+                game.consumeResourceCards("road", playerNo);
+                break;
+            case "upgradeSettlement":
+                if(!game.areThereEnoughResources("upgrade", playerNo))
+                {
+                    return -2;
+                }
+                if(null == upgradeSettlement(gameID, edgeOrNodeIndex, playerNo))
+                {
+                    return -4;
+                }
+                game.consumeResourceCards("upgrade", playerNo);
+                break;
+            case "endTurn":
+                endTurn(gameID);
+                break;
+        }
+        return 0;
     }
 
     @Transactional
@@ -97,11 +152,7 @@ public class GameService {
         endTurn(gameID);
     }
 
-    @Transactional
-    public Integer endTurn(int gameID) throws NullPointerException
-    {
-        return gameRepository.getGameByGameID(gameID).endTurn();
-    }
+
 
     @Transactional
     public Boolean setLongestRoad_LongestRoadOwner(int gameID) throws NullPointerException

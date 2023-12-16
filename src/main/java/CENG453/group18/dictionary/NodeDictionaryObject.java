@@ -12,6 +12,4 @@ public class NodeDictionaryObject {
     List<Integer> adjacentNodes = new ArrayList<>();
     List<Integer> adjacentEdges = new ArrayList<>();
     List<Integer> adjacentTiles = new ArrayList<>();
-
-
 }

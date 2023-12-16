@@ -31,4 +31,14 @@ public class Tile
     @ManyToOne
     @JoinColumn(name = "gameBoard_id")
     private GameBoard owner;
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if(obj instanceof Tile tile)
+        {
+            return this.tileIndex == tile.tileIndex;
+        }
+        return false;
+    }
 }

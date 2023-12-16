@@ -45,9 +45,9 @@ public class GameController {
                     @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json") }),
             })
     @PostMapping("/create")
-    public ResponseEntity<Game> createGame()
+    public ResponseEntity<Game> createGame(int hostID)
     {
-        Game game = gameService.createGame();
+        Game game = gameService.createGame(hostID);
 
         return ResponseEntity.ok(game);
     }
@@ -67,70 +67,41 @@ public class GameController {
             return ResponseEntity.status(500).body(false);  // Deletion failed
         }
     }
-    @Operation(summary = "Add settlement to the gameboard", tags = { "game", "addSettlement" })
+
+
+    @Operation(summary = "Player can do 4 types of operations: Add settlement, add road, upgrade settlement, end the turn", tags = { "game", "playerMove" })
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {
                     @Content(schema = @Schema(implementation = Settlement.class), mediaType = "application/json") }),
-            @ApiResponse(responseCode = "204", description = "Placement is not appropriate" ),
+            @ApiResponse(responseCode = "204", description = "It's not player's turn" ),
+            @ApiResponse(responseCode = "205", description = "Not enough resources" ),
+            @ApiResponse(responseCode = "206", description = "Not appropriate location" ),
+            @ApiResponse(responseCode = "207", description = "Can't upgrade the settlement" ),
     })
-    @PostMapping("/addSettlement")
-    public ResponseEntity<Settlement> addSettlement(int gameID, int nodeIndex, int playerNo)
+    @PostMapping("/playerMove")
+    public ResponseEntity<Integer> playerMove(int gameID, String moveType, int edgeOrNodeIndex, int playerNo)
     {
         try {
-            Settlement settlement = gameService.addSettlement(gameID, nodeIndex, playerNo);
-            if(settlement != null)
+            Integer result = gameService.playerMove(gameID, moveType, edgeOrNodeIndex, playerNo);
+            if(result == 0)
             {
-                return ResponseEntity.ok(settlement);
+                return ResponseEntity.ok(0);
             }
-            else
+            else if(result == -1)
             {
                 return ResponseEntity.status(204).body(null);
             }
-        }catch (HttpServerErrorException.InternalServerError e) {
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-    @Operation(summary = "Add road to the gameboard", tags = { "game", "addRoad" })
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", content = {
-                    @Content(schema = @Schema(implementation = Settlement.class), mediaType = "application/json") }),
-            @ApiResponse(responseCode = "204", description = "Placement is not appropriate" ),
-    })
-    @PostMapping("/addRoad")
-    public ResponseEntity<Road> addRoad(int gameID, int edgeIndex, int playerNo)
-    {
-        try {
-            Road road = gameService.addRoad(gameID, edgeIndex, playerNo);
-            if(road != null)
+            else if(result == -2)
             {
-                return ResponseEntity.ok(road);
+                return ResponseEntity.status(205).body(null);
+            }
+            else if(result == -3)
+            {
+                return ResponseEntity.status(206).body(null);
             }
             else
             {
-                return ResponseEntity.status(204).body(null);
-            }
-        }catch (HttpServerErrorException.InternalServerError e) {
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-    @Operation(summary = "Upgrade a settlement from level 1 to level 2", tags = { "game", "upgradeSettlement" })
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", content = {
-                    @Content(schema = @Schema(implementation = Settlement.class), mediaType = "application/json") }),
-            @ApiResponse(responseCode = "204", description = "Upgrade is not appropriate" ),
-    })
-    @PostMapping("/upgradeSettlement")
-    public ResponseEntity<Settlement> upgradeSettlement(int gameID, int nodeIndex, int playerNo)
-    {
-        try {
-            Settlement settlement = gameService.upgradeSettlement(gameID, nodeIndex, playerNo);
-            if(settlement != null)
-            {
-                return ResponseEntity.ok(settlement);
-            }
-            else
-            {
-                return ResponseEntity.status(204).body(null);
+                return ResponseEntity.status(207).body(null);
             }
         }catch (HttpServerErrorException.InternalServerError e) {
             return ResponseEntity.status(500).body(null);
@@ -175,24 +146,6 @@ public class GameController {
         }
     }
 
-    @Operation(summary = "Ends the turn", tags = { "game", "endTurn" })
-    @ApiResponses({
-            @ApiResponse(responseCode = "200" ),
-            @ApiResponse(responseCode = "204", description = "No record with that id"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @PostMapping("/endTurn")
-    public ResponseEntity<Integer> endTurn(int gameID)
-    {
-        try {
-            return ResponseEntity.ok(gameService.endTurn(gameID));
-        }catch (NullPointerException e) {
-            return ResponseEntity.status(204).body(null);
-        }
-        catch (HttpServerErrorException.InternalServerError e) {
-            return ResponseEntity.status(500).body(null);
-        }
-    }
     @Operation(summary = "Sets the longest road length and longest road owner player no", tags = { "game", "setLongestRoad" })
     @ApiResponses({
             @ApiResponse(responseCode = "200" ),

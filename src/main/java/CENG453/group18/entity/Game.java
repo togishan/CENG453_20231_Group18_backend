@@ -1,6 +1,9 @@
 package CENG453.group18.entity;
 
 
+import CENG453.group18.dictionary.GameBoardDictionary;
+import CENG453.group18.dictionary.NodeDictionaryObject;
+import CENG453.group18.enums.CardType;
 import CENG453.group18.enums.GameType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,6 +21,7 @@ import java.util.Random;
 @Setter
 @AllArgsConstructor
 @Entity
+@NoArgsConstructor
 public class Game {
 
     // store it in the frontend and use it when sending api requests
@@ -33,8 +37,8 @@ public class Game {
     // and once the game is finished the local scores will be added to player's total
     // score to be displayed in th scoreboard
 
-    private int[] playerIDs;
-    private int[] scores;
+    private int[] playerIDs = new int[4];
+    private int[] scores = new int[4];
 
     // whose turn is now. if the player-1 is playing, then turn is 1 ...
     // if the player-4 is playing, then turn is 4, and again it's player-1's turn and turn is 1
@@ -59,14 +63,34 @@ public class Game {
     private Integer currentLongestRoadOwnerPlayerNo;
 
 
+
     // Constructor must be changed by adding and attaching players and additional features
-    public Game() {
+    public Game(int playerID) {
         this.gameboard = new GameBoard();
         turn = 1;
+        if(gameType == GameType.SinglePlayer)
+        {
+            playerIDs[0] = playerID;
+        }
+        for(int i=0; i<4; i++)
+        {
+            PlayerCardDeck playerCardDeck = new PlayerCardDeck();
+            ArrayList<Card> cards = new ArrayList<>();
+            cards.add(new Card(CardType.GRAIN));
+            cards.add(new Card(CardType.WOOL));
+            cards.add(new Card(CardType.ORE));
+            cards.add(new Card(CardType.BRICK));
+            cards.add(new Card(CardType.LUMBER));
+            playerCardDeck.setCards(cards);
+            playerCardDeckList.add(playerCardDeck);
+        }
 
         // add cards to each player at beginning (resources adjacent to initial settlements)
         // implement distributeCards and add here
-        // todo
+        for(int i=2; i<13; i++)
+        {
+            distributeAllCards(i);
+        }
 
     }
 
@@ -83,6 +107,7 @@ public class Game {
     {
         Random rand = new Random();
         currentDice = rand.nextInt(2,13);
+        distributeAllCards(currentDice);
         return currentDice;
     }
 
@@ -97,6 +122,8 @@ public class Game {
         // only implement bot logic here using resource cards, game board and the dice
         // can add sleep function to make it look like a human
         System.out.println(currentDice);
+
+
         //todo
 
     }
@@ -105,16 +132,196 @@ public class Game {
     public Integer endTurn()
     {
         turn = turn%4 + 1;
+
+        // set longest road
+        // check winner
+        // send log to the frontend
+        // if there is a winner end the game and set the scores
         return turn;
         //todo
     }
 
     // once the dice is rolled add cards to card decks of players, depend on their settlement placements
-    private void distributeCards()
+    private void distributeAllCards(int currentDice)
     {
-        // todo
+        for(int i=0; i<gameboard.getTiles().size(); i++)
+        {
+            if(gameboard.getTiles().get(i).getTileNumber() == currentDice)
+            {
+                distributeCardsToAdjacentSettlements(i);
+            }
+
+        }
     }
 
+    private void distributeCardsToAdjacentSettlements(int tileIndex)
+    {
+        Tile tile = gameboard.getTiles().get(tileIndex);
+        Card card = new Card();
+        switch (tile.getTileType())
+        {
+            case FIELDS:
+                card.setCardType(CardType.GRAIN);
+                break;
+            case FOREST:
+                card.setCardType(CardType.LUMBER);
+                break;
+            case HILLS:
+                card.setCardType(CardType.BRICK);
+                break;
+            case MOUNTAINS:
+                card.setCardType(CardType.ORE);
+                break;
+            case PASTURES:
+                card.setCardType(CardType.WOOL);
+                break;
+        }
+
+        for (int i=0; i<gameboard.getSettlements().size(); i++)
+        {
+            if(isSettlementAdjacentToTile(gameboard.getSettlements().get(i).getNodeIndex(), tileIndex))
+            {
+                Settlement settlement = gameboard.getSettlements().get(i);
+                int settlementOwnerPlayerNo = settlement.getPlayerNo();
+                int cardIndex = playerCardDeckList.get(settlementOwnerPlayerNo - 1).getCards().indexOf(card);
+                if(settlement.getSettlementLevel() == 1)
+                {
+                    playerCardDeckList.get(settlementOwnerPlayerNo - 1).getCards().get(cardIndex).incrementCardCount(1);
+                }
+                else
+                {
+                    playerCardDeckList.get(settlementOwnerPlayerNo - 1).getCards().get(cardIndex).incrementCardCount(2);
+                }
+            }
+        }
+    }
+
+    private boolean isSettlementAdjacentToTile(int nodeIndex, int tileIndex)
+    {
+        NodeDictionaryObject nodeDictionaryObject = GameBoard.gameBoardDictionary.getNode(nodeIndex);
+        Tile tile = new Tile();
+        tile.setTileIndex(tileIndex);
+        return nodeDictionaryObject.getAdjacentTiles().contains(tile);
+    }
+
+    public boolean areThereEnoughResources(String buildType, int playerNo)
+    {
+        List<Card> cards = getPlayerCardDeckList().get(playerNo -1).getCards();
+        int trueCount = 0;
+        switch (buildType)
+        {
+            case "settlement":
+                for(int i=0; i<cards.size(); i++)
+                {
+                    if(cards.get(i).getCardType() == CardType.LUMBER && cards.get(i).getCardCount() >= 1)
+                    {
+                        trueCount ++;
+                    }
+                    else if(cards.get(i).getCardType() == CardType.BRICK && cards.get(i).getCardCount() >= 1)
+                    {
+                        trueCount ++;
+                    }
+                    else if(cards.get(i).getCardType() == CardType.GRAIN && cards.get(i).getCardCount() >= 1)
+                    {
+                        trueCount ++;
+                    }
+                    else if(cards.get(i).getCardType() == CardType.WOOL && cards.get(i).getCardCount() >= 1)
+                    {
+                        trueCount ++;
+                    }
+                }
+                if(trueCount == 4)
+                {
+                    return true;
+                }
+                break;
+
+            case "road":
+                for(int i=0; i<cards.size(); i++)
+                {
+                    if(cards.get(i).getCardType() == CardType.LUMBER && cards.get(i).getCardCount() >= 1)
+                    {
+                        trueCount ++;
+                    }
+                    else if(cards.get(i).getCardType() == CardType.BRICK && cards.get(i).getCardCount() >= 1)
+                    {
+                        trueCount ++;
+                    }
+                }
+                if(trueCount == 2)
+                {
+                    return true;
+                }
+                break;
+            case "upgrade":
+                for(int i=0; i<cards.size(); i++)
+                {
+                    if(cards.get(i).getCardType() == CardType.ORE && cards.get(i).getCardCount() >= 3)
+                    {
+                        trueCount ++;
+                    }
+                    else if(cards.get(i).getCardType() == CardType.GRAIN && cards.get(i).getCardCount() >= 2)
+                    {
+                        trueCount ++;
+                    }
+                }
+                if(trueCount == 2)
+                {
+                    return true;
+                }
+                break;
+        }
+        return false;
+    }
+    public void consumeResourceCards(String buildType, int playerNo)
+    {
+        switch (buildType)
+        {
+            case "settlement":
+                Card temp1 = new Card();
+                temp1.setCardType(CardType.LUMBER);
+                int index1 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp1);
+                playerCardDeckList.get(playerNo-1).getCards().get(index1).decrementCardCount(1);
+
+                Card temp2 = new Card();
+                temp2.setCardType(CardType.BRICK);
+                int index2 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp2);
+                playerCardDeckList.get(playerNo-1).getCards().get(index2).decrementCardCount(1);
+
+                Card temp3 = new Card();
+                temp3.setCardType(CardType.GRAIN);
+                int index3 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp3);
+                playerCardDeckList.get(playerNo-1).getCards().get(index3).decrementCardCount(1);
+
+                Card temp4 = new Card();
+                temp4.setCardType(CardType.WOOL);
+                int index4 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp4);
+                playerCardDeckList.get(playerNo-1).getCards().get(index4).decrementCardCount(1);
+                break;
+            case "road":
+                Card temp5 = new Card();
+                temp5.setCardType(CardType.LUMBER);
+                int index5 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp5);
+                playerCardDeckList.get(playerNo-1).getCards().get(index5).decrementCardCount(1);
+
+                Card temp6 = new Card();
+                temp6.setCardType(CardType.BRICK);
+                int index6 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp6);
+                playerCardDeckList.get(playerNo-1).getCards().get(index6).decrementCardCount(1);
+                break;
+            case "upgrade":
+                Card temp7 = new Card();
+                temp7.setCardType(CardType.ORE);
+                int index7 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp7);
+                playerCardDeckList.get(playerNo-1).getCards().get(index7).decrementCardCount(3);
+
+                Card temp8 = new Card();
+                temp8.setCardType(CardType.GRAIN);
+                int index8 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp8);
+                playerCardDeckList.get(playerNo-1).getCards().get(index8).decrementCardCount(2);
+                break;
+        }
+    }
     public void setLongestRoadInTheGame()
     {
         int tempCurrentLongestRoadLength = 0;
@@ -132,5 +339,4 @@ public class Game {
         currentLongestRoadLength = tempCurrentLongestRoadLength;
         currentLongestRoadOwnerPlayerNo = tempCurrentLongestRoadOwnerPlayerNo;
     }
-
 }

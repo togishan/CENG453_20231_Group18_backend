@@ -34,7 +34,7 @@ public class GameBoard {
      * no need to store it in a database      */
 
     @Transient
-    private static final GameBoardDictionary gameBoardDictionary = new GameBoardDictionary();
+    public static final GameBoardDictionary gameBoardDictionary = new GameBoardDictionary();
 
     // Stores all node and their adjacent nodes' indices
     // For any new settlement these indices are not valid to place
