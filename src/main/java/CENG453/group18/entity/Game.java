@@ -123,6 +123,40 @@ public class Game {
         // can add sleep function to make it look like a human
         System.out.println(currentDice);
 
+        /**
+        // Check if the bot has enough resources to build a settlement
+        if (hasEnoughResourcesForSettlement(playerNo)) {
+            // Find an appropriate location for the settlement
+            Integer settlementLocation = this.gameboard.findAppropriateSettlementPlacement(playerNo);
+
+            // If a suitable location is found...
+            if (settlementLocation != null) {
+                // Add a settlement there
+                this.gameboard.addSettlementToPlayer(new Settlement(settlementLocation), playerNo);
+
+                // Deduct the resources used to build the settlement
+                deductResourcesForSettlement(playerNo);
+            }
+        }
+
+        // Check if the bot has enough resources to build a road
+        if (hasEnoughResourcesForRoad(playerNo)) {
+            // Find an appropriate location for the road
+            Integer roadLocation = this.gameboard.findAppropriateRoadPlacement(playerNo);
+
+            // If a suitable location is found...
+            if (roadLocation != null) {
+                // Add a road there
+                this.gameboard.addRoadToPlayer(new Road(roadLocation), playerNo);
+
+                // Deduct the resources used to build the road
+                deductResourcesForRoad(playerNo);
+            }
+        }
+        **/
+
+
+
 
         //todo
 
@@ -322,6 +356,7 @@ public class Game {
                 break;
         }
     }
+    
     public void setLongestRoadInTheGame()
     {
         int tempCurrentLongestRoadLength = 0;
