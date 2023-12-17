@@ -149,15 +149,57 @@ public class GameService {
         return gameRepository.getGameByGameID(gameID).rollTheDice();
     }
 
-    /*@Transactional
+    @Transactional
     public void botPlay(int gameID, int playerNo)
     {
         // bot plays its turn and ends it
         rollTheDice(gameID);
-        gameRepository.getGameByGameID(gameID).botPlay(playerNo);
+        botBuild(gameID, playerNo);
         endTurn(gameID);
-    }*/
+    }
+    @Transactional
+    public void botBuild(int gameID, int playerNo) {
+        Game game = gameRepository.getGameByGameID(gameID);
 
+        // Check if the bot has enough resources to build a road
+        if (game.hasEnoughResourcesForRoad(playerNo)) {
+            // Find a suitable location to place a new road
+            Integer roadLocation = game.getGameboard().findAppropriateRoadPlacement(playerNo);
+
+            // If a suitable location is found, build a road there
+            if (roadLocation != null) {
+                // Call playerMove to add a road at the found location
+                // consumeResources is called by playerMove
+                playerMove(gameID, "addRoad", roadLocation, playerNo);
+            }
+        }
+
+        // Check if the bot has enough resources to build a settlement
+        if (game.hasEnoughResourcesForSettlement(playerNo)) {
+            // Find a suitable location to place a new settlement
+            Integer settlementLocation = game.getGameboard().findAppropriateSettlementPlacement(playerNo);
+
+            // If a suitable location is found, build a settlement there
+            if (settlementLocation != null) {
+                // Call playerMove to add a settlement at the found location
+                // consumeResources is called by playerMove
+                playerMove(gameID, "addSettlement", settlementLocation, playerNo);
+            }
+        }
+
+        // Check if the bot has enough resources to upgrade a settlement to a city
+        if (game.hasEnoughResourcesForUpgrade(playerNo)) {
+            // Find a settlement that can be upgraded to a city
+            Integer upgradeableSettlement = game.getGameboard().findUpgradeableSettlement(playerNo);
+
+            // If an upgradeable settlement is found, upgrade it to a city
+            if (upgradeableSettlement != null) {
+                // Call playerMove to upgrade the settlement to a city
+                // consumeResources is called by playerMove
+                playerMove(gameID, "upgradeSettlement", upgradeableSettlement, playerNo);
+            }
+        }
+    }
 
 
     @Transactional

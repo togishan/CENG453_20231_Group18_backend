@@ -156,59 +156,14 @@ public class Game {
                resourceCounts.getOrDefault(CardType.GRAIN, 0) >= 2;
     }
 
-    /*public void botPlay(int playerNo) {
-        // Print the current dice roll
-        System.out.println(currentDice);
 
-        // Check if the bot has enough resources to build a settlement
-        if (hasEnoughResourcesForSettlement(playerNo)) {
-            // Find a suitable location to place a new settlement
-            Integer settlementLocation = this.gameboard.findAppropriateSettlementPlacement(playerNo);
-
-            // If a suitable location is found, build a settlement there
-            if (settlementLocation != null) {
-                // Call the game service to add a settlement at the found location
-                this.gameService.playerMove(gameID, "addSettlement", settlementLocation, playerNo);
-                // Deduct the resources used to build the settlement from the bot's resource cards
-                consumeResourceCards("settlement", playerNo);
-            }
-        }
-
-        // Check if the bot has enough resources to build a road
-        if (hasEnoughResourcesForRoad(playerNo)) {
-            // Find a suitable location to place a new road
-            Integer roadLocation = this.gameboard.findAppropriateRoadPlacement(playerNo);
-
-            // If a suitable location is found, build a road there
-            if (roadLocation != null) {
-                // Call the game service to add a road at the found location
-                this.gameService.playerMove(gameID, "addRoad", roadLocation, playerNo);
-                // Deduct the resources used to build the road from the bot's resource cards
-                consumeResourceCards("road", playerNo);
-            }
-        }
-
-        // Check if the bot has enough resources to upgrade a settlement to a city
-        if (hasEnoughResourcesForUpgrade(playerNo)) {
-            // Find a settlement that can be upgraded to a city
-            Integer upgradeableSettlement = this.gameboard.findUpgradeableSettlement(playerNo);
-
-            // If an upgradeable settlement is found, upgrade it to a city
-            if (upgradeableSettlement != null) {
-                // Call the game service to upgrade the settlement to a city
-                this.gameService.playerMove(gameID, "upgradeSettlement", upgradeableSettlement, playerNo);
-                // Deduct the resources used to upgrade the settlement from the bot's resource cards
-                consumeResourceCards("upgrade", playerNo);
-            }
-        }
-    }*/
 
     // end the turn and notify the players whose turn is started
     public Integer endTurn()
     {
         turn = turn%4 + 1;
 
-        // set longest road
+        // set the longest road
         // check winner
         // send log to the frontend
         // if there is a winner end the game and set the scores
