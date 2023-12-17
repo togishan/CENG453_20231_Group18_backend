@@ -145,7 +145,7 @@ public class Game {
     }
 
     // Method to check if a player has enough resources to build a city
-    public boolean hasEnoughResourcesForCity(int playerNo) {
+    public boolean hasEnoughResourcesForUpgrade(int playerNo) {
         // Get the resource counts for the player
         Map<CardType, Integer> resourceCounts = playerCardDeckList.get(playerNo - 1).getResourceCounts();
     
@@ -188,7 +188,7 @@ public class Game {
         }
 
         // Check if the bot has enough resources to upgrade a settlement to a city
-        if (hasEnoughResourcesForCity(playerNo)) {
+        if (hasEnoughResourcesForUpgrade(playerNo)) {
             // Find a settlement that can be upgraded to a city
             Integer upgradeableSettlement = this.gameboard.findUpgradeableSettlement(playerNo);
 

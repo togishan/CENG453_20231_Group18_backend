@@ -13,8 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 @Service
 public class GameService {
@@ -90,52 +93,53 @@ public class GameService {
     }
     
     @Transactional
-    public Integer playerMove(int gameID, String moveType, int edgeOrNodeIndex, int playerNo)
-    {
+    public Integer playerMove(int gameID, String moveType, int edgeOrNodeIndex, int playerNo) {
+        // Fetch game and check player's turn
         Game game = gameRepository.getGameByGameID(gameID);
-        if(game.getTurn() != playerNo)
-        {
-            return -1;
+        if(game.getTurn() != playerNo) return -1;
+
+        // Define move strategies
+        Map<String, Function<Integer, Integer>> moveStrategies = new HashMap<>();
+        moveStrategies.put("addSettlement", (player) -> performSettlementMove(game, edgeOrNodeIndex, player));
+        moveStrategies.put("addRoad", (player) -> performRoadMove(game, edgeOrNodeIndex, player));
+        moveStrategies.put("upgradeSettlement", (player) -> performUpgradeMove(game, edgeOrNodeIndex, player));
+        moveStrategies.put("endTurn", (player) -> { endTurn(gameID); return 0; });
+
+        // Execute move if valid, else throw exception
+        if (moveStrategies.containsKey(moveType)) return moveStrategies.get(moveType).apply(playerNo);
+        else throw new IllegalArgumentException("Invalid move type: " + moveType);
+    }
+
+    private Integer performSettlementMove(Game game, int edgeOrNodeIndex, int playerNo) {
+        if(!game.hasEnoughResourcesForSettlement(playerNo)) {
+            return -2;
         }
-        switch (moveType)
-        {
-            case "addSettlement":
-                if(!game.areThereEnoughResources("settlement", playerNo))
-                {
-                    return -2;
-                }
-                if(null == addSettlement(gameID, edgeOrNodeIndex, playerNo))
-                {
-                    return -3;
-                }
-                game.consumeResourceCards("settlement", playerNo);
-                break;
-            case "addRoad":
-                if(!game.areThereEnoughResources("road", playerNo))
-                {
-                    return -2;
-                }
-                if(null == addRoad(gameID, edgeOrNodeIndex, playerNo))
-                {
-                    return -3;
-                }
-                game.consumeResourceCards("road", playerNo);
-                break;
-            case "upgradeSettlement":
-                if(!game.areThereEnoughResources("upgrade", playerNo))
-                {
-                    return -2;
-                }
-                if(null == upgradeSettlement(gameID, edgeOrNodeIndex, playerNo))
-                {
-                    return -4;
-                }
-                game.consumeResourceCards("upgrade", playerNo);
-                break;
-            case "endTurn":
-                endTurn(gameID);
-                break;
+        if(null == addSettlement(game.getGameID(), edgeOrNodeIndex, playerNo)) {
+            return -3;
         }
+        game.consumeResourceCards("settlement", playerNo);
+        return 0;
+    }
+
+    private Integer performRoadMove(Game game, int edgeOrNodeIndex, int playerNo) {
+        if(!game.hasEnoughResourcesForRoad(playerNo)) {
+            return -2;
+        }
+        if(null == addRoad(game.getGameID(), edgeOrNodeIndex, playerNo)) {
+            return -3;
+        }
+        game.consumeResourceCards("road", playerNo);
+        return 0;
+    }
+
+    private Integer performUpgradeMove(Game game, int edgeOrNodeIndex, int playerNo) {
+        if(!game.hasEnoughResourcesForUpgrade(playerNo)) {
+            return -2;
+        }
+        if(null == upgradeSettlement(game.getGameID(), edgeOrNodeIndex, playerNo)) {
+            return -4;
+        }
+        game.consumeResourceCards("upgrade", playerNo);
         return 0;
     }
 
