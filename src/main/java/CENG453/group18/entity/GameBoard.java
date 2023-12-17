@@ -177,6 +177,84 @@ public class GameBoard {
     }
 
     /**
+     * This method finds an appropriate placement for a settlement for a given player.
+     *
+     * @param playerNo The number of the player (1-4).
+     * @return The index of an appropriate node for settlement placement, or null if no such node exists.
+     */
+    public Integer findAppropriateSettlementPlacement(int playerNo) {
+        // Get a list of all nodes where the player can place a settlement
+        List<Integer> appropriateNodes = findAllAppropriateNodes(playerNo);
+
+        // If there are no appropriate nodes, return null
+        if (appropriateNodes.isEmpty()) {
+            return null;
+        }
+
+        // Otherwise, randomly select one of the appropriate nodes and return its index
+        Random rand = new Random();
+        int randomIndex = rand.nextInt(appropriateNodes.size());
+        return appropriateNodes.get(randomIndex);
+    }
+
+    /**
+     * This helper method finds all nodes where a given player can place a settlement.
+     *
+     * @param playerNo The number of the player (1-4).
+     * @return A list of the indices of all appropriate nodes for settlement placement.
+     */
+    private List<Integer> findAllAppropriateNodes(int playerNo) {
+        // Create a list to store the indices of the appropriate nodes
+        List<Integer> appropriateNodes = new ArrayList<>();
+
+        // Get a list of the player's nodes
+        List<Integer> playerNodes = getPlayerNodes(playerNo);
+
+        // For each of these nodes...
+        for (Integer nodeIndex : playerNodes) {
+            // If the player can place a settlement on the node...
+            if (isSettlementPlacementAppropriate(nodeIndex, playerNo)) { 
+                // Add the node's index to the list of appropriate nodes
+                appropriateNodes.add(nodeIndex);
+            }
+        }
+
+        // Return the list of appropriate nodes
+        return appropriateNodes;
+    }
+
+    /**
+     * This helper method gets a list of nodes that a given player has.
+     *
+     * @param playerNo The number of the player (1-4).
+     * @return A list of the indices of all nodes that the player has.
+     */
+    private List<Integer> getPlayerNodes(int playerNo) {
+        // Create a list to store the indices of the player's nodes
+        List<Integer> playerNodes = new ArrayList<>();
+
+        // Get a list of the player's roads
+        List<Road> playerRoads = getPlayerRoads(playerNo);
+
+        // For each of the player's roads...
+        for (Road road : playerRoads) {
+            // Get the indices of the nodes at the ends of the road
+            Integer node1_index = gameBoardDictionary.getEdge(road.getEdgeIndex()).getNode1_index();
+            Integer node2_index = gameBoardDictionary.getEdge(road.getEdgeIndex()).getNode2_index();
+
+            // Add the node indices to the list of player's nodes
+            playerNodes.add(node1_index);
+            playerNodes.add(node2_index);
+        }
+
+        // Remove duplicates from the list
+        playerNodes = new ArrayList<>(new HashSet<>(playerNodes));
+
+        // Return the list of player's nodes
+        return playerNodes;
+    }
+
+    /**
      * This method adds tile types to the game board.
      * It randomly assigns a type to each tile, ensuring that the correct number of each type is used.
      */
