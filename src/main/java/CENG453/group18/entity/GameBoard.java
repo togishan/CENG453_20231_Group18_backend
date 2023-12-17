@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Getter
 @Setter
@@ -630,6 +631,59 @@ public class GameBoard {
             }
         }
         return null;
+    }
+
+/**
+     * Helper method to get the settlements of a specific player.
+     *
+     * @param playerNo The number of the player.
+     * @return The list of settlements belonging to the player, or null if the player number is not valid.
+     */
+    private List<Settlement> getPlayerSettlements(int playerNo) {
+        switch (playerNo) {
+            case 1:
+                return player1Settlements;
+            case 2:
+                return player2Settlements;
+            case 3:
+                return player3Settlements;
+            case 4:
+                return player4Settlements;
+            default:
+                // If the player number is not valid, return null
+                return null;
+        }
+    }
+
+    /**
+     * Find a settlement of a specific player that can be upgraded.
+     *
+     * @param playerNo The number of the player.
+     * @return A random settlement belonging to the player and at level 1, or null if there are no such settlements or the player number is not valid.
+     */
+    public Integer findUpgradeableSettlement(int playerNo) {
+        // Get the settlements of the player
+        List<Settlement> playerSettlements = getPlayerSettlements(playerNo);
+
+        // If the player number is not valid, return null
+        if (playerSettlements == null) {
+            return null;
+        }
+
+        // Filter the settlements at level 1 and get their indices
+        List<Integer> upgradeableSettlementIndices = IntStream.range(0, playerSettlements.size())
+            .filter(i -> playerSettlements.get(i).getSettlementLevel() == 1)
+            .boxed()
+            .collect(Collectors.toList());
+
+        // If there are no upgradeable settlements, return null
+        if (upgradeableSettlementIndices.isEmpty()) {
+            return null;
+        }
+
+        // Select a random index from the list
+        Random rand = new Random();
+        return upgradeableSettlementIndices.get(rand.nextInt(upgradeableSettlementIndices.size()));
     }
 
     /**

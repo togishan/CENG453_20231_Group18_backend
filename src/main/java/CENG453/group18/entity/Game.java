@@ -5,6 +5,7 @@ import CENG453.group18.dictionary.GameBoardDictionary;
 import CENG453.group18.dictionary.NodeDictionaryObject;
 import CENG453.group18.enums.CardType;
 import CENG453.group18.enums.GameType;
+import CENG453.group18.service.GameService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import org.checkerframework.checker.units.qual.C;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -31,6 +33,7 @@ public class Game {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private GameBoard gameboard;
+    private GameService gameService;
 
     // These containers are not the correct implementation make it be stored in the database,
     // The idea is simple: the game will hold all of its players reference
@@ -64,34 +67,39 @@ public class Game {
 
 
 
-    // Constructor must be changed by adding and attaching players and additional features
-    public Game(int playerID) {
+    public Game(int playerID, GameType gameType, GameService gameService) {
         this.gameboard = new GameBoard();
-        turn = 1;
-        if(gameType == GameType.SinglePlayer)
-        {
-            playerIDs[0] = playerID;
+        this.gameService = gameService;
+        this.turn = 1;
+        this.gameType = gameType;
+        this.playerIDs = new int[4];
+        
+        if(gameType == GameType.SinglePlayer) {
+            this.playerIDs[0] = playerID;
         }
-        for(int i=0; i<4; i++)
-        {
+
+        initializePlayerCardDecks();
+        distributeInitialCards();
+    }
+
+    private void initializePlayerCardDecks() {
+        CardType[] cardTypes = CardType.values();
+
+        for(int i = 0; i < 4; i++) {
             PlayerCardDeck playerCardDeck = new PlayerCardDeck();
-            ArrayList<Card> cards = new ArrayList<>();
-            cards.add(new Card(CardType.GRAIN));
-            cards.add(new Card(CardType.WOOL));
-            cards.add(new Card(CardType.ORE));
-            cards.add(new Card(CardType.BRICK));
-            cards.add(new Card(CardType.LUMBER));
-            playerCardDeck.setCards(cards);
+
+            for (CardType cardType : cardTypes) {
+                playerCardDeck.addCard(new Card(cardType));
+            }
+
             playerCardDeckList.add(playerCardDeck);
         }
+    }
 
-        // add cards to each player at beginning (resources adjacent to initial settlements)
-        // implement distributeCards and add here
-        for(int i=2; i<13; i++)
-        {
+    private void distributeInitialCards() {
+        for(int i = 2; i < 13; i++) {
             distributeAllCards(i);
         }
-
     }
 
     public void setGameType(GameType gameType) {
@@ -111,6 +119,29 @@ public class Game {
         return currentDice;
     }
 
+    public boolean hasEnoughResourcesForSettlement(int playerNo) {
+        Map<CardType, Integer> resourceCounts = playerCardDeckList.get(playerNo - 1).getResourceCounts();
+    
+        return resourceCounts.getOrDefault(CardType.LUMBER, 0) >= 1 &&
+               resourceCounts.getOrDefault(CardType.BRICK, 0) >= 1 &&
+               resourceCounts.getOrDefault(CardType.GRAIN, 0) >= 1 &&
+               resourceCounts.getOrDefault(CardType.WOOL, 0) >= 1;
+    }
+
+    public boolean hasEnoughResourcesForRoad(int playerNo) {
+        Map<CardType, Integer> resourceCounts = playerCardDeckList.get(playerNo - 1).getResourceCounts();
+
+        return resourceCounts.getOrDefault(CardType.LUMBER, 0) >= 1 &&
+               resourceCounts.getOrDefault(CardType.BRICK, 0) >= 1;
+    }
+
+    public boolean hasEnoughResourcesForCity(int playerNo) {
+        Map<CardType, Integer> resourceCounts = playerCardDeckList.get(playerNo - 1).getResourceCounts();
+    
+        return resourceCounts.getOrDefault(CardType.ORE, 0) >= 3 &&
+               resourceCounts.getOrDefault(CardType.GRAIN, 0) >= 2;
+    }
+
     // bot with playerNo plays its turn
     // human player does not need this automated function. If it is human player's turn
     // then depending on player's choice call api functions separately until endTurn is invoked by the
@@ -122,8 +153,7 @@ public class Game {
         // only implement bot logic here using resource cards, game board and the dice
         // can add sleep function to make it look like a human
         System.out.println(currentDice);
-
-        /**
+        
         // Check if the bot has enough resources to build a settlement
         if (hasEnoughResourcesForSettlement(playerNo)) {
             // Find an appropriate location for the settlement
@@ -132,10 +162,9 @@ public class Game {
             // If a suitable location is found...
             if (settlementLocation != null) {
                 // Add a settlement there
-                this.gameboard.addSettlementToPlayer(new Settlement(settlementLocation), playerNo);
-
+                this.gameService.playerMove(gameID, "addSettlement", settlementLocation, playerNo);
                 // Deduct the resources used to build the settlement
-                deductResourcesForSettlement(playerNo);
+                consumeResourceCards("settlement", playerNo);
             }
         }
 
@@ -147,18 +176,26 @@ public class Game {
             // If a suitable location is found...
             if (roadLocation != null) {
                 // Add a road there
-                this.gameboard.addRoadToPlayer(new Road(roadLocation), playerNo);
-
+                this.gameService.playerMove(gameID, "addRoad", roadLocation, playerNo);
                 // Deduct the resources used to build the road
-                deductResourcesForRoad(playerNo);
+                consumeResourceCards("road", playerNo);
             }
         }
-        **/
 
+        // Check if the bot has enough resources to build a city
+        if (hasEnoughResourcesForCity(playerNo)) {
+            // Find an upgradeable settlement
+            Integer upgradeableSettlement = this.gameboard.findUpgradeableSettlement(playerNo);
 
-
-
-        //todo
+            // If an upgradeable settlement is found...
+            if (upgradeableSettlement != null) {
+                // Upgrade the settlement to a city
+                this.gameService.playerMove(gameID, "upgradeSettlement", upgradeableSettlement, playerNo);
+                // Deduct the resources used to upgrade the settlement
+                consumeResourceCards("upgrade", playerNo);
+            }
+        }
+        
 
     }
 

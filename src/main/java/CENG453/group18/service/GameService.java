@@ -4,6 +4,7 @@ import CENG453.group18.entity.Game;
 import CENG453.group18.entity.GameBoard;
 import CENG453.group18.entity.Road;
 import CENG453.group18.entity.Settlement;
+import CENG453.group18.enums.GameType;
 import CENG453.group18.repository.GameBoardRepository;
 import CENG453.group18.repository.GameRepository;
 import jakarta.transaction.Transactional;
@@ -24,7 +25,7 @@ public class GameService {
     @Transactional
     public Game createGame(int hostID)
     {
-        Game game = new Game(hostID);
+        Game game = new Game(hostID, GameType.SinglePlayer, this);
         gameBoardRepository.save(game.getGameboard());
         return gameRepository.save(game);
     }
@@ -87,6 +88,7 @@ public class GameService {
     {
         return gameRepository.getGameByGameID(gameID).endTurn();
     }
+    
     @Transactional
     public Integer playerMove(int gameID, String moveType, int edgeOrNodeIndex, int playerNo)
     {
