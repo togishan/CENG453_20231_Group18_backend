@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Map;
+import java.util.HashMap;
 
 @Getter
 @Setter
@@ -277,122 +278,22 @@ public class Game {
         return nodeDictionaryObject.getAdjacentTiles().contains(tile);
     }
 
-    public boolean areThereEnoughResources(String buildType, int playerNo)
-    {
-        List<Card> cards = getPlayerCardDeckList().get(playerNo -1).getCards();
-        int trueCount = 0;
-        switch (buildType)
-        {
-            case "settlement":
-                for(int i=0; i<cards.size(); i++)
-                {
-                    if(cards.get(i).getCardType() == CardType.LUMBER && cards.get(i).getCardCount() >= 1)
-                    {
-                        trueCount ++;
-                    }
-                    else if(cards.get(i).getCardType() == CardType.BRICK && cards.get(i).getCardCount() >= 1)
-                    {
-                        trueCount ++;
-                    }
-                    else if(cards.get(i).getCardType() == CardType.GRAIN && cards.get(i).getCardCount() >= 1)
-                    {
-                        trueCount ++;
-                    }
-                    else if(cards.get(i).getCardType() == CardType.WOOL && cards.get(i).getCardCount() >= 1)
-                    {
-                        trueCount ++;
-                    }
-                }
-                if(trueCount == 4)
-                {
-                    return true;
-                }
-                break;
+    public void consumeResourceCards(String buildType, int playerNo) {
+        // Define the resources needed for each build type
+        Map<String, Map<CardType, Integer>> buildResources = new HashMap<>();
+        buildResources.put("settlement", Map.of(CardType.LUMBER, 1, CardType.BRICK, 1, CardType.GRAIN, 1, CardType.WOOL, 1));
+        buildResources.put("road", Map.of(CardType.LUMBER, 1, CardType.BRICK, 1));
+        buildResources.put("upgrade", Map.of(CardType.ORE, 3, CardType.GRAIN, 2));
 
-            case "road":
-                for(int i=0; i<cards.size(); i++)
-                {
-                    if(cards.get(i).getCardType() == CardType.LUMBER && cards.get(i).getCardCount() >= 1)
-                    {
-                        trueCount ++;
-                    }
-                    else if(cards.get(i).getCardType() == CardType.BRICK && cards.get(i).getCardCount() >= 1)
-                    {
-                        trueCount ++;
-                    }
-                }
-                if(trueCount == 2)
-                {
-                    return true;
-                }
-                break;
-            case "upgrade":
-                for(int i=0; i<cards.size(); i++)
-                {
-                    if(cards.get(i).getCardType() == CardType.ORE && cards.get(i).getCardCount() >= 3)
-                    {
-                        trueCount ++;
-                    }
-                    else if(cards.get(i).getCardType() == CardType.GRAIN && cards.get(i).getCardCount() >= 2)
-                    {
-                        trueCount ++;
-                    }
-                }
-                if(trueCount == 2)
-                {
-                    return true;
-                }
-                break;
-        }
-        return false;
-    }
-    public void consumeResourceCards(String buildType, int playerNo)
-    {
-        switch (buildType)
-        {
-            case "settlement":
-                Card temp1 = new Card();
-                temp1.setCardType(CardType.LUMBER);
-                int index1 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp1);
-                playerCardDeckList.get(playerNo-1).getCards().get(index1).decrementCardCount(1);
+        // Get the resources needed for the specified build type
+        Map<CardType, Integer> neededResources = buildResources.get(buildType);
 
-                Card temp2 = new Card();
-                temp2.setCardType(CardType.BRICK);
-                int index2 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp2);
-                playerCardDeckList.get(playerNo-1).getCards().get(index2).decrementCardCount(1);
-
-                Card temp3 = new Card();
-                temp3.setCardType(CardType.GRAIN);
-                int index3 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp3);
-                playerCardDeckList.get(playerNo-1).getCards().get(index3).decrementCardCount(1);
-
-                Card temp4 = new Card();
-                temp4.setCardType(CardType.WOOL);
-                int index4 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp4);
-                playerCardDeckList.get(playerNo-1).getCards().get(index4).decrementCardCount(1);
-                break;
-            case "road":
-                Card temp5 = new Card();
-                temp5.setCardType(CardType.LUMBER);
-                int index5 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp5);
-                playerCardDeckList.get(playerNo-1).getCards().get(index5).decrementCardCount(1);
-
-                Card temp6 = new Card();
-                temp6.setCardType(CardType.BRICK);
-                int index6 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp6);
-                playerCardDeckList.get(playerNo-1).getCards().get(index6).decrementCardCount(1);
-                break;
-            case "upgrade":
-                Card temp7 = new Card();
-                temp7.setCardType(CardType.ORE);
-                int index7 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp7);
-                playerCardDeckList.get(playerNo-1).getCards().get(index7).decrementCardCount(3);
-
-                Card temp8 = new Card();
-                temp8.setCardType(CardType.GRAIN);
-                int index8 = playerCardDeckList.get(playerNo-1).getCards().indexOf(temp8);
-                playerCardDeckList.get(playerNo-1).getCards().get(index8).decrementCardCount(2);
-                break;
+        // For each needed resource, decrement its count
+        for (Map.Entry<CardType, Integer> entry : neededResources.entrySet()) {
+            Card temp = new Card();
+            temp.setCardType(entry.getKey());
+            int index = playerCardDeckList.get(playerNo - 1).getCards().indexOf(temp);
+            playerCardDeckList.get(playerNo - 1).getCards().get(index).decrementCardCount(entry.getValue());
         }
     }
     
