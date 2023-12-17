@@ -11,14 +11,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.antlr.v4.runtime.misc.Pair;
-import org.checkerframework.checker.units.qual.C;
+// import org.antlr.v4.runtime.misc.Pair; 
+// import org.checkerframework.checker.units.qual.C; 
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Map;
 import java.util.HashMap;
+
 
 @Getter
 @Setter
@@ -34,6 +35,7 @@ public class Game {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private GameBoard gameboard;
+    @Transient
     private GameService gameService;
 
     // These containers are not the correct implementation make it be stored in the database,

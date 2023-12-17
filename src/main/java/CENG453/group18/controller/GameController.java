@@ -78,6 +78,7 @@ public class GameController {
             @ApiResponse(responseCode = "206", description = "Not appropriate location" ),
             @ApiResponse(responseCode = "207", description = "Can't upgrade the settlement" ),
     })
+
     @PostMapping("/playerMove")
     public ResponseEntity<Integer> playerMove(int gameID, String moveType, int edgeOrNodeIndex, int playerNo)
     {
@@ -107,6 +108,7 @@ public class GameController {
             return ResponseEntity.status(500).body(null);
         }
     }
+    
     @Operation(summary = "Assigns random number ranging from 2 to 12 to the dice", tags = { "game", "rollTheDice" })
     @ApiResponses({
             @ApiResponse(responseCode = "200" ),
