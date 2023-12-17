@@ -28,7 +28,7 @@ public class GameService {
     @Transactional
     public Game createGame(int hostID)
     {
-        Game game = new Game(hostID, GameType.SinglePlayer, this);
+        Game game = new Game(hostID, GameType.SinglePlayer);
         gameBoardRepository.save(game.getGameboard());
         return gameRepository.save(game);
     }
@@ -149,14 +149,14 @@ public class GameService {
         return gameRepository.getGameByGameID(gameID).rollTheDice();
     }
 
-    @Transactional
+    /*@Transactional
     public void botPlay(int gameID, int playerNo)
     {
         // bot plays its turn and ends it
         rollTheDice(gameID);
         gameRepository.getGameByGameID(gameID).botPlay(playerNo);
         endTurn(gameID);
-    }
+    }*/
 
 
 

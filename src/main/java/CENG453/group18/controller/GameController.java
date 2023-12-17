@@ -128,7 +128,7 @@ public class GameController {
         }
     }
 
-    @Operation(summary = "Bot plays its turn", tags = { "game", "botPlay" })
+    /*@Operation(summary = "Bot plays its turn", tags = { "game", "botPlay" })
     @ApiResponses({
             @ApiResponse(responseCode = "200" ),
             @ApiResponse(responseCode = "204", description = "No record with that id"),
@@ -146,7 +146,7 @@ public class GameController {
         catch (HttpServerErrorException.InternalServerError e) {
             return ResponseEntity.status(500).body(false);
         }
-    }
+    }*/
 
     @Operation(summary = "Sets the longest road length and longest road owner player no", tags = { "game", "setLongestRoad" })
     @ApiResponses({

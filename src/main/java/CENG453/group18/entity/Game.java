@@ -5,7 +5,7 @@ import CENG453.group18.dictionary.GameBoardDictionary;
 import CENG453.group18.dictionary.NodeDictionaryObject;
 import CENG453.group18.enums.CardType;
 import CENG453.group18.enums.GameType;
-import CENG453.group18.service.GameService;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,8 +35,8 @@ public class Game {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private GameBoard gameboard;
-    @Transient
-    private GameService gameService;
+
+
 
     // These containers are not the correct implementation make it be stored in the database,
     // The idea is simple: the game will hold all of its players reference
@@ -70,9 +70,8 @@ public class Game {
 
 
 
-    public Game(int playerID, GameType gameType, GameService gameService) {
+    public Game(int playerID, GameType gameType) {
         this.gameboard = new GameBoard();
-        this.gameService = gameService;
         this.turn = 1;
         this.gameType = gameType;
         this.playerIDs = new int[4];
@@ -157,7 +156,7 @@ public class Game {
                resourceCounts.getOrDefault(CardType.GRAIN, 0) >= 2;
     }
 
-    public void botPlay(int playerNo) {
+    /*public void botPlay(int playerNo) {
         // Print the current dice roll
         System.out.println(currentDice);
 
@@ -202,7 +201,7 @@ public class Game {
                 consumeResourceCards("upgrade", playerNo);
             }
         }
-    }
+    }*/
 
     // end the turn and notify the players whose turn is started
     public Integer endTurn()
@@ -275,9 +274,7 @@ public class Game {
     private boolean isSettlementAdjacentToTile(int nodeIndex, int tileIndex)
     {
         NodeDictionaryObject nodeDictionaryObject = GameBoard.gameBoardDictionary.getNode(nodeIndex);
-        Tile tile = new Tile();
-        tile.setTileIndex(tileIndex);
-        return nodeDictionaryObject.getAdjacentTiles().contains(tile);
+        return nodeDictionaryObject.getAdjacentTiles().contains(tileIndex);
     }
 
     public void consumeResourceCards(String buildType, int playerNo) {

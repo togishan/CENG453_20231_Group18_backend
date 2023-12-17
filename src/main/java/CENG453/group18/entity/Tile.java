@@ -37,6 +37,7 @@ public class Tile
     {
         if(obj instanceof Tile tile)
         {
+            System.out.println("heeree");
             return this.tileIndex == tile.tileIndex;
         }
         return false;
