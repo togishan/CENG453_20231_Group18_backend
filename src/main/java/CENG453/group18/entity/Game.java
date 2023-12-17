@@ -119,84 +119,86 @@ public class Game {
         return currentDice;
     }
 
+    // Method to check if a player has enough resources to build a settlement
     public boolean hasEnoughResourcesForSettlement(int playerNo) {
+        // Get the resource counts for the player
         Map<CardType, Integer> resourceCounts = playerCardDeckList.get(playerNo - 1).getResourceCounts();
     
+        // Check if the player has at least 1 Lumber, 1 Brick, 1 Grain, and 1 Wool
+        // Return true if the player has enough resources, false otherwise
         return resourceCounts.getOrDefault(CardType.LUMBER, 0) >= 1 &&
                resourceCounts.getOrDefault(CardType.BRICK, 0) >= 1 &&
                resourceCounts.getOrDefault(CardType.GRAIN, 0) >= 1 &&
                resourceCounts.getOrDefault(CardType.WOOL, 0) >= 1;
     }
 
+    // Method to check if a player has enough resources to build a road
     public boolean hasEnoughResourcesForRoad(int playerNo) {
+        // Get the resource counts for the player
         Map<CardType, Integer> resourceCounts = playerCardDeckList.get(playerNo - 1).getResourceCounts();
 
+        // Check if the player has at least 1 Lumber and 1 Brick
+        // Return true if the player has enough resources, false otherwise
         return resourceCounts.getOrDefault(CardType.LUMBER, 0) >= 1 &&
                resourceCounts.getOrDefault(CardType.BRICK, 0) >= 1;
     }
 
+    // Method to check if a player has enough resources to build a city
     public boolean hasEnoughResourcesForCity(int playerNo) {
+        // Get the resource counts for the player
         Map<CardType, Integer> resourceCounts = playerCardDeckList.get(playerNo - 1).getResourceCounts();
     
+        // Check if the player has at least 3 Ores and 2 Grains
+        // Return true if the player has enough resources, false otherwise
         return resourceCounts.getOrDefault(CardType.ORE, 0) >= 3 &&
                resourceCounts.getOrDefault(CardType.GRAIN, 0) >= 2;
     }
 
-    // bot with playerNo plays its turn
-    // human player does not need this automated function. If it is human player's turn
-    // then depending on player's choice call api functions separately until endTurn is invoked by the
-    // player
-    public void botPlay(int playerNo)
-    {
-
-        // don't call endTurn or rollTheDice here, they are already called in the botPlay service
-        // only implement bot logic here using resource cards, game board and the dice
-        // can add sleep function to make it look like a human
+    public void botPlay(int playerNo) {
+        // Print the current dice roll
         System.out.println(currentDice);
-        
+
         // Check if the bot has enough resources to build a settlement
         if (hasEnoughResourcesForSettlement(playerNo)) {
-            // Find an appropriate location for the settlement
+            // Find a suitable location to place a new settlement
             Integer settlementLocation = this.gameboard.findAppropriateSettlementPlacement(playerNo);
 
-            // If a suitable location is found...
+            // If a suitable location is found, build a settlement there
             if (settlementLocation != null) {
-                // Add a settlement there
+                // Call the game service to add a settlement at the found location
                 this.gameService.playerMove(gameID, "addSettlement", settlementLocation, playerNo);
-                // Deduct the resources used to build the settlement
+                // Deduct the resources used to build the settlement from the bot's resource cards
                 consumeResourceCards("settlement", playerNo);
             }
         }
 
         // Check if the bot has enough resources to build a road
         if (hasEnoughResourcesForRoad(playerNo)) {
-            // Find an appropriate location for the road
+            // Find a suitable location to place a new road
             Integer roadLocation = this.gameboard.findAppropriateRoadPlacement(playerNo);
 
-            // If a suitable location is found...
+            // If a suitable location is found, build a road there
             if (roadLocation != null) {
-                // Add a road there
+                // Call the game service to add a road at the found location
                 this.gameService.playerMove(gameID, "addRoad", roadLocation, playerNo);
-                // Deduct the resources used to build the road
+                // Deduct the resources used to build the road from the bot's resource cards
                 consumeResourceCards("road", playerNo);
             }
         }
 
-        // Check if the bot has enough resources to build a city
+        // Check if the bot has enough resources to upgrade a settlement to a city
         if (hasEnoughResourcesForCity(playerNo)) {
-            // Find an upgradeable settlement
+            // Find a settlement that can be upgraded to a city
             Integer upgradeableSettlement = this.gameboard.findUpgradeableSettlement(playerNo);
 
-            // If an upgradeable settlement is found...
+            // If an upgradeable settlement is found, upgrade it to a city
             if (upgradeableSettlement != null) {
-                // Upgrade the settlement to a city
+                // Call the game service to upgrade the settlement to a city
                 this.gameService.playerMove(gameID, "upgradeSettlement", upgradeableSettlement, playerNo);
-                // Deduct the resources used to upgrade the settlement
+                // Deduct the resources used to upgrade the settlement from the bot's resource cards
                 consumeResourceCards("upgrade", playerNo);
             }
         }
-        
-
     }
 
     // end the turn and notify the players whose turn is started
