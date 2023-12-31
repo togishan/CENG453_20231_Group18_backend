@@ -1,22 +1,17 @@
 package CENG453.group18.service;
 
-import CENG453.group18.entity.Game;
-import CENG453.group18.entity.GameBoard;
-import CENG453.group18.entity.Road;
-import CENG453.group18.entity.Settlement;
+import CENG453.group18.entity.*;
 import CENG453.group18.enums.GameType;
 import CENG453.group18.repository.GameBoardRepository;
 import CENG453.group18.repository.GameRepository;
+import CENG453.group18.repository.PlayerRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -25,10 +20,15 @@ public class GameService {
     private GameRepository gameRepository;
     @Autowired
     private GameBoardRepository gameBoardRepository;
+    @Autowired
+    PlayerRepository playerRepository;
+    @Autowired
+    ScoreService scoreService;
     @Transactional
-    public Game createGame(int hostID)
+    public Game createSinglePlayerGame(String username)
     {
-        Game game = new Game(hostID, GameType.SinglePlayer);
+        Player player = playerRepository.findPlayerByUsername(username);
+        Game game = new Game(player, null, null, null, GameType.SinglePlayer);
         gameBoardRepository.save(game.getGameboard());
         return gameRepository.save(game);
     }
@@ -52,7 +52,6 @@ public class GameService {
             return false;  // Deletion failed
         }
     }
-
 
     private Settlement addSettlement(int gameID, int nodeIndex, int playerNo)
     {
@@ -87,11 +86,10 @@ public class GameService {
         return settlement;
     }
 
-    private Integer endTurn(int gameID) throws NullPointerException
+    public Game getGameState(int gameID)
     {
-        return gameRepository.getGameByGameID(gameID).endTurn();
+        return gameRepository.getGameByGameID(gameID);
     }
-    
     @Transactional
     public Integer playerMove(int gameID, String moveType, int edgeOrNodeIndex, int playerNo) {
         // Fetch game and check player's turn
@@ -100,11 +98,11 @@ public class GameService {
 
         // Define move strategies
         Map<String, Function<Integer, Integer>> moveStrategies = new HashMap<>();
+        moveStrategies.put("rollDice", (player) -> rollTheDice(gameID));
         moveStrategies.put("addSettlement", (player) -> performSettlementMove(game, edgeOrNodeIndex, player));
         moveStrategies.put("addRoad", (player) -> performRoadMove(game, edgeOrNodeIndex, player));
         moveStrategies.put("upgradeSettlement", (player) -> performUpgradeMove(game, edgeOrNodeIndex, player));
-        moveStrategies.put("endTurn", (player) -> { endTurn(gameID); return 0; });
-
+        moveStrategies.put("endTurn", (player) ->  endTurn(gameID));
         // Execute move if valid, else throw exception
         if (moveStrategies.containsKey(moveType)) return moveStrategies.get(moveType).apply(playerNo);
         else throw new IllegalArgumentException("Invalid move type: " + moveType);
@@ -118,6 +116,7 @@ public class GameService {
             return -3;
         }
         game.consumeResourceCards("settlement", playerNo);
+        game.incrementPlayerScore(playerNo, 1);
         return 0;
     }
 
@@ -140,15 +139,73 @@ public class GameService {
             return -4;
         }
         game.consumeResourceCards("upgrade", playerNo);
+        game.incrementPlayerScore(playerNo, 1);
         return 0;
     }
 
     @Transactional
     public Integer rollTheDice(int gameID)
     {
-        return gameRepository.getGameByGameID(gameID).rollTheDice();
+        Game game = gameRepository.getGameByGameID(gameID);
+        if(game.getDiceRolled())
+        {
+            return -5;
+        }
+        game.setDiceRolled(true);
+        Random rand = new Random();
+        int currentDice = rand.nextInt(2,13);
+        game.setCurrentDice(currentDice);
+        game.distributeAllCards(currentDice);
+        return 0;
     }
 
+    // set the longest road, check winning condition,
+    @Transactional
+    public Integer endTurn(int gameID) throws NullPointerException
+    {
+        Game game = gameRepository.getGameByGameID(gameID);
+        if(!game.getDiceRolled())
+        {
+            return -6;
+        }
+        game.setDiceRolled(false);
+        game.setTurn(game.getTurn()%4 + 1);
+        game.setLongestRoadInTheGame();
+        if (game.getPlayer1Score()>=8)
+        {
+            System.out.println("Player: " + game.getPlayer1().getUsername() + " wins!");
+            return endGame(gameID);
+        }
+        else if (game.getPlayer2Score()>=8)
+        {
+            System.out.println("Player: " + game.getPlayer2().getUsername() + " wins!");
+            return endGame(gameID);
+        }
+        else if (game.getPlayer3Score()>=8)
+        {
+            System.out.println("Player: " + game.getPlayer3().getUsername() + " wins!");
+            return endGame(gameID);
+        }
+        else if (game.getPlayer4Score()>=8)
+        {
+            System.out.println("Player: " + game.getPlayer4().getUsername() + " wins!");
+            return endGame(gameID);
+        }
+        return 0;
+    }
+
+    private Integer endGame(int gameID) {
+        Game game = gameRepository.getGameByGameID(gameID);
+
+        scoreService.saveScore(game.getPlayer1().getUsername(), game.getPlayer1Score());
+        if (game.getGameType() == GameType.Multiplayer) {
+            scoreService.saveScore(game.getPlayer2().getUsername(), game.getPlayer2Score());
+            scoreService.saveScore(game.getPlayer3().getUsername(), game.getPlayer3Score());
+            scoreService.saveScore(game.getPlayer4().getUsername(), game.getPlayer4Score());
+
+        }
+        return -7;
+    }
     @Transactional
     public void botPlay(int gameID, int playerNo)
     {
@@ -200,14 +257,5 @@ public class GameService {
             }
         }
     }
-
-
-    @Transactional
-    public Boolean setLongestRoad_LongestRoadOwner(int gameID) throws NullPointerException
-    {
-        gameRepository.getGameByGameID(gameID).setLongestRoadInTheGame();
-        return true;
-    }
-
 
 }

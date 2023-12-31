@@ -6,6 +6,7 @@ import CENG453.group18.dictionary.NodeDictionaryObject;
 import CENG453.group18.enums.CardType;
 import CENG453.group18.enums.GameType;
 
+import CENG453.group18.repository.PlayerRepository;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,16 +37,27 @@ public class Game {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private GameBoard gameboard;
 
+    @OneToOne
+    @JoinColumn(name = "player1")
+    Player player1;
+    @OneToOne
+    @JoinColumn(name = "player2")
+    Player player2;
+    @OneToOne
+    @JoinColumn(name = "player3")
+    Player player3;
+    @OneToOne
+    @JoinColumn(name = "player4")
+    Player player4;
 
-
-    // These containers are not the correct implementation make it be stored in the database,
-    // The idea is simple: the game will hold all of its players reference
-    // and once the game is finished the local scores will be added to player's total
-    // score to be displayed in th scoreboard
-
-    private int[] playerIDs = new int[4];
-    private int[] scores = new int[4];
-
+    @Column(name = "player1-score")
+    Integer player1Score;
+    @Column(name = "player2-score")
+    Integer player2Score;
+    @Column(name = "player3-score")
+    Integer player3Score;
+    @Column(name = "player4-score")
+    Integer player4Score;
     // whose turn is now. if the player-1 is playing, then turn is 1 ...
     // if the player-4 is playing, then turn is 4, and again it's player-1's turn and turn is 1
     // don't forget to make a single player authorized to change game until it's turn finishes
@@ -68,16 +80,29 @@ public class Game {
     @Column(name = "current_longest_road_owner_playerNo")
     private Integer currentLongestRoadOwnerPlayerNo;
 
+    // whether the dice is rolled for this turn
+    @Column(name = "diceRolled")
+    private Boolean diceRolled;
 
-
-    public Game(int playerID, GameType gameType) {
+    public Game(Player player1, Player player2, Player player3, Player player4, GameType gameType) {
         this.gameboard = new GameBoard();
         this.turn = 1;
         this.gameType = gameType;
-        this.playerIDs = new int[4];
-        
+        this.player1Score = 1;
+        this.player2Score = 1;
+        this.player3Score = 1;
+        this.player4Score = 1;
+        this.currentLongestRoadLength = 0;
+        this.currentLongestRoadOwnerPlayerNo = 0;
+        this.diceRolled = true;
         if(gameType == GameType.SinglePlayer) {
-            this.playerIDs[0] = playerID;
+            this.player1 = player1;
+        }
+        else{
+            this.player1 = player1;
+            this.player2 = player2;
+            this.player3 = player3;
+            this.player4 = player4;
         }
 
         initializePlayerCardDecks();
@@ -89,25 +114,27 @@ public class Game {
 
         for(int i = 0; i < 4; i++) {
             PlayerCardDeck playerCardDeck = new PlayerCardDeck();
-
             for (CardType cardType : cardTypes) {
                 playerCardDeck.addCard(new Card(cardType));
             }
-
             playerCardDeckList.add(playerCardDeck);
         }
     }
 
     private void distributeInitialCards() {
+        // cards from tiles
         for(int i = 2; i < 13; i++) {
             distributeAllCards(i);
         }
-    }
-
-    public void setGameType(GameType gameType) {
-        this.gameType = gameType;
-    }
-
+        // cards from initial settings
+        for(int i = 0; i<4; i++)
+        {
+            playerCardDeckList.get(i).incrementResourceCounts(CardType.LUMBER, 3);
+            playerCardDeckList.get(i).incrementResourceCounts(CardType.BRICK, 3);
+            playerCardDeckList.get(i).incrementResourceCounts(CardType.GRAIN, 1);
+            playerCardDeckList.get(i).incrementResourceCounts(CardType.WOOL, 1);
+        }
+}
 
     // Instead of assigning random value here it can be changed this way:
     // Roll 2 rice, get sum of them and assign the value here
@@ -156,13 +183,15 @@ public class Game {
                resourceCounts.getOrDefault(CardType.GRAIN, 0) >= 2;
     }
 
-
-
     // end the turn and notify the players whose turn is started
     public Integer endTurn()
     {
         turn = turn%4 + 1;
+        setLongestRoadInTheGame();
+        if(player1Score >= 8)
+        {
 
+        }
         // set the longest road
         // check winner
         // send log to the frontend
@@ -171,8 +200,13 @@ public class Game {
         //todo
     }
 
+    private void endGame()
+    {
+
+    }
+
     // once the dice is rolled add cards to card decks of players, depend on their settlement placements
-    private void distributeAllCards(int currentDice)
+    public void distributeAllCards(int currentDice)
     {
         for(int i=0; i<gameboard.getTiles().size(); i++)
         {
@@ -180,32 +214,19 @@ public class Game {
             {
                 distributeCardsToAdjacentSettlements(i);
             }
-
         }
     }
 
     private void distributeCardsToAdjacentSettlements(int tileIndex)
     {
         Tile tile = gameboard.getTiles().get(tileIndex);
-        Card card = new Card();
-        switch (tile.getTileType())
-        {
-            case FIELDS:
-                card.setCardType(CardType.GRAIN);
-                break;
-            case FOREST:
-                card.setCardType(CardType.LUMBER);
-                break;
-            case HILLS:
-                card.setCardType(CardType.BRICK);
-                break;
-            case MOUNTAINS:
-                card.setCardType(CardType.ORE);
-                break;
-            case PASTURES:
-                card.setCardType(CardType.WOOL);
-                break;
-        }
+        CardType cardType = switch (tile.getTileType()) {
+            case FIELDS -> CardType.GRAIN;
+            case FOREST -> CardType.LUMBER;
+            case HILLS -> CardType.BRICK;
+            case MOUNTAINS -> CardType.ORE;
+            default -> CardType.WOOL;
+        };
 
         for (int i=0; i<gameboard.getSettlements().size(); i++)
         {
@@ -213,14 +234,13 @@ public class Game {
             {
                 Settlement settlement = gameboard.getSettlements().get(i);
                 int settlementOwnerPlayerNo = settlement.getPlayerNo();
-                int cardIndex = playerCardDeckList.get(settlementOwnerPlayerNo - 1).getCards().indexOf(card);
                 if(settlement.getSettlementLevel() == 1)
                 {
-                    playerCardDeckList.get(settlementOwnerPlayerNo - 1).getCards().get(cardIndex).incrementCardCount(1);
+                    playerCardDeckList.get(settlementOwnerPlayerNo-1).incrementResourceCounts(cardType ,1);
                 }
                 else
                 {
-                    playerCardDeckList.get(settlementOwnerPlayerNo - 1).getCards().get(cardIndex).incrementCardCount(2);
+                    playerCardDeckList.get(settlementOwnerPlayerNo-1).incrementResourceCounts(cardType,2);
                 }
             }
         }
@@ -233,24 +253,67 @@ public class Game {
     }
 
     public void consumeResourceCards(String buildType, int playerNo) {
-        // Define the resources needed for each build type
-        Map<String, Map<CardType, Integer>> buildResources = new HashMap<>();
-        buildResources.put("settlement", Map.of(CardType.LUMBER, 1, CardType.BRICK, 1, CardType.GRAIN, 1, CardType.WOOL, 1));
-        buildResources.put("road", Map.of(CardType.LUMBER, 1, CardType.BRICK, 1));
-        buildResources.put("upgrade", Map.of(CardType.ORE, 3, CardType.GRAIN, 2));
-
-        // Get the resources needed for the specified build type
-        Map<CardType, Integer> neededResources = buildResources.get(buildType);
-
-        // For each needed resource, decrement its count
-        for (Map.Entry<CardType, Integer> entry : neededResources.entrySet()) {
-            Card temp = new Card();
-            temp.setCardType(entry.getKey());
-            int index = playerCardDeckList.get(playerNo - 1).getCards().indexOf(temp);
-            playerCardDeckList.get(playerNo - 1).getCards().get(index).decrementCardCount(entry.getValue());
+        switch (buildType)
+        {
+            case "settlement":
+                playerCardDeckList.get(playerNo - 1).decrementResourceCounts(CardType.LUMBER,1);
+                playerCardDeckList.get(playerNo - 1).decrementResourceCounts(CardType.BRICK,1);
+                playerCardDeckList.get(playerNo - 1).decrementResourceCounts(CardType.GRAIN,1);
+                playerCardDeckList.get(playerNo - 1).decrementResourceCounts(CardType.WOOL,1);
+                break;
+            case "road":
+                playerCardDeckList.get(playerNo - 1).decrementResourceCounts(CardType.LUMBER,1);
+                playerCardDeckList.get(playerNo - 1).decrementResourceCounts(CardType.BRICK,1);
+                break;
+            case "upgrade":
+                playerCardDeckList.get(playerNo - 1).decrementResourceCounts(CardType.ORE,3);
+                playerCardDeckList.get(playerNo - 1).decrementResourceCounts(CardType.GRAIN,2);
+                break;
         }
     }
-    
+
+    // once the player have the longest road or built a settlement or city increment its score
+    public void incrementPlayerScore(int playerNo, int score)
+    {
+        switch (playerNo)
+        {
+            case 1:
+                player1Score += score;
+                break;
+            case 2:
+                player2Score += score;
+                break;
+            case 3:
+                player3Score += score;
+                break;
+            case 4:
+                player4Score += score;
+                break;
+            default:
+                break;
+        }
+    }
+    // once the player have the longest road or built a settlement or city increment its score
+    public void decrementPlayerScore(int playerNo, int score)
+    {
+        switch (playerNo)
+        {
+            case 1:
+                player1Score -= score;
+                break;
+            case 2:
+                player2Score -= score;
+                break;
+            case 3:
+                player3Score -= score;
+                break;
+            case 4:
+                player4Score -= score;
+                break;
+            default:
+                break;
+        }
+    }
     public void setLongestRoadInTheGame()
     {
         int tempCurrentLongestRoadLength = 0;
@@ -264,6 +327,18 @@ public class Game {
                 tempCurrentLongestRoadLength = tempLength;
                 tempCurrentLongestRoadOwnerPlayerNo = i;
             }
+        }
+        // increment the score of the current owner of the longest road
+        if(tempCurrentLongestRoadLength >= 5 && currentLongestRoadOwnerPlayerNo != tempCurrentLongestRoadOwnerPlayerNo)
+        {
+            // if the previous owner's road length is >= threshold, then decrement its score since it was
+            // getting 2 points from it, but it is not the owner of the longest road anymore
+            if(currentLongestRoadLength >= 5)
+            {
+                decrementPlayerScore(currentLongestRoadOwnerPlayerNo, 2);
+            }
+            // transfer score to the new owner
+            incrementPlayerScore(tempCurrentLongestRoadOwnerPlayerNo, 2);
         }
         currentLongestRoadLength = tempCurrentLongestRoadLength;
         currentLongestRoadOwnerPlayerNo = tempCurrentLongestRoadOwnerPlayerNo;

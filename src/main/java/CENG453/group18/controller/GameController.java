@@ -39,15 +39,16 @@ public class GameController {
         }
         return ResponseEntity.ok(gameService.getAllGames());
     }
-    @Operation(summary = "Create a game instance", tags = { "game", "create" })
+    @Operation(summary = "Create a single player game instance", tags = { "game", "create" })
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {
                     @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json") }),
             })
-    @PostMapping("/create")
-    public ResponseEntity<Game> createGame(int hostID)
+    @PostMapping("/createSinglePlayer")
+    public ResponseEntity<Game> createSinglePlayerGame(String username)
     {
-        Game game = gameService.createGame(hostID);
+        System.out.println(username);
+        Game game = gameService.createSinglePlayerGame(username);
 
         return ResponseEntity.ok(game);
     }
@@ -68,101 +69,75 @@ public class GameController {
         }
     }
 
-
-    @Operation(summary = "Player can do 4 types of operations: Add settlement, add road, upgrade settlement, end the turn", tags = { "game", "playerMove" })
+    @Operation(summary = "Player can perform various game moves: rollDice, addSettlement, addRoad, upgradeSettlement, endTurn",
+            tags = { "game", "playerMove" })
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {
-                    @Content(schema = @Schema(implementation = Settlement.class), mediaType = "application/json") }),
-            @ApiResponse(responseCode = "204", description = "It's not player's turn" ),
-            @ApiResponse(responseCode = "205", description = "Not enough resources" ),
-            @ApiResponse(responseCode = "206", description = "Not appropriate location" ),
-            @ApiResponse(responseCode = "207", description = "Can't upgrade the settlement" ),
+                    @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "204", description = "It's not the player's turn", content = {
+                    @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "205", description = "Not enough resources", content = {
+                    @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "206", description = "Not an appropriate location", content = {
+                    @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "207", description = "Can't upgrade the settlement", content = {
+                    @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "208", description = "Can't roll the dice more than once for a turn", content = {
+                    @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "209", description = "Can't end turn without rolling a dice", content = {
+                    @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "210", description = "Game over", content = {
+                    @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
 
     @PostMapping("/playerMove")
-    public ResponseEntity<Integer> playerMove(int gameID, String moveType, int edgeOrNodeIndex, int playerNo)
+    public ResponseEntity<Game> playerMove(int gameID, String moveType, int edgeOrNodeIndex, int playerNo)
     {
         try {
             Integer result = gameService.playerMove(gameID, moveType, edgeOrNodeIndex, playerNo);
+            Game game = gameService.getGameState(gameID);
             if(result == 0)
             {
-                return ResponseEntity.ok(0);
+                return ResponseEntity.ok(game);
             }
             else if(result == -1)
             {
-                return ResponseEntity.status(204).body(null);
+                return ResponseEntity.status(204).body(game);
             }
             else if(result == -2)
             {
-                return ResponseEntity.status(205).body(null);
+                return ResponseEntity.status(205).body(game);
             }
             else if(result == -3)
             {
-                return ResponseEntity.status(206).body(null);
+                return ResponseEntity.status(206).body(game);
+            }
+            else if(result == -4)
+            {
+                return ResponseEntity.status(207).body(game);
+            }
+            else if(result == -5)
+            {
+                return ResponseEntity.status(208).body(game);
+            }
+            else if(result == -6)
+            {
+                return ResponseEntity.status(209).body(game);
             }
             else
             {
-                return ResponseEntity.status(207).body(null);
+                return ResponseEntity.status(209).body(game);
             }
         }catch (HttpServerErrorException.InternalServerError e) {
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-    
-    @Operation(summary = "Assigns random number ranging from 2 to 12 to the dice", tags = { "game", "rollTheDice" })
-    @ApiResponses({
-            @ApiResponse(responseCode = "200" ),
-            @ApiResponse(responseCode = "204", description = "No record with that id"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @PostMapping("/rollTheDice")
-    public ResponseEntity<Integer> rollTheDice(int gameID)
-    {
-        try {
-            return ResponseEntity.ok(gameService.rollTheDice(gameID));
-        }catch (NullPointerException e) {
-            return ResponseEntity.status(204).body(null);
-        }
-        catch (HttpServerErrorException.InternalServerError e) {
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-
-    /*@Operation(summary = "Bot plays its turn", tags = { "game", "botPlay" })
-    @ApiResponses({
-            @ApiResponse(responseCode = "200" ),
-            @ApiResponse(responseCode = "204", description = "No record with that id"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @PostMapping("/botPlay")
-    public ResponseEntity<Boolean> botPlay(int gameID, int playerNo)
-    {
-        try {
-            gameService.botPlay(gameID, playerNo);
-            return ResponseEntity.ok(true);
-        }catch (NullPointerException e) {
-            return ResponseEntity.status(204).body(false);
-        }
-        catch (HttpServerErrorException.InternalServerError e) {
-            return ResponseEntity.status(500).body(false);
-        }
-    }*/
-
-    @Operation(summary = "Sets the longest road length and longest road owner player no", tags = { "game", "setLongestRoad" })
-    @ApiResponses({
-            @ApiResponse(responseCode = "200" ),
-            @ApiResponse(responseCode = "204", description = "No record with that id"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @PostMapping("/setLongestRoad")
-    public ResponseEntity<Boolean> setLongestRoad(int gameID)
-    {
-        try {
-            return ResponseEntity.ok(gameService.setLongestRoad_LongestRoadOwner(gameID));
-        }catch (NullPointerException e) {
-            return ResponseEntity.status(204).body(null);
-        }
-        catch (HttpServerErrorException.InternalServerError e) {
             return ResponseEntity.status(500).body(null);
         }
     }

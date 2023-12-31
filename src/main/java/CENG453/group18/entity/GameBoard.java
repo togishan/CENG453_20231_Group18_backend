@@ -117,7 +117,6 @@ public class GameBoard {
                 }
             }
         }
-
         // Return the list of appropriate edges
         return appropriateEdges;
     }
@@ -146,12 +145,10 @@ public class GameBoard {
         if (isRoadAlreadyPlaced(edgeIndex)) {
             return false;
         }
-
         // Check if there's a road belonging to the player on an edge adjacent to the given edge
         if (isAdjacentRoadBelongsToPlayer(edgeIndex, playerNo)) {
             return true;
         }
-
         // If none of the above conditions are met, it's not appropriate to place a road on the given edge
         return false;
     }
@@ -186,12 +183,10 @@ public class GameBoard {
     public Integer findAppropriateSettlementPlacement(int playerNo) {
         // Get a list of all nodes where the player can place a settlement
         List<Integer> appropriateNodes = findAllAppropriateNodes(playerNo);
-
         // If there are no appropriate nodes, return null
         if (appropriateNodes.isEmpty()) {
             return null;
         }
-
         // Otherwise, randomly select one of the appropriate nodes and return its index
         Random rand = new Random();
         int randomIndex = rand.nextInt(appropriateNodes.size());
@@ -219,7 +214,6 @@ public class GameBoard {
                 appropriateNodes.add(nodeIndex);
             }
         }
-
         // Return the list of appropriate nodes
         return appropriateNodes;
     }

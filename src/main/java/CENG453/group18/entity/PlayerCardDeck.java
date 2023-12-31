@@ -26,6 +26,23 @@ public class PlayerCardDeck {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Card> cards = new ArrayList<>();
 
+    public void incrementResourceCounts(CardType cardType, int count)
+    {
+        for (Card card : cards) {
+            if (cardType == card.getCardType()) {
+                card.incrementCardCount(count);
+            }
+        }
+    }
+
+    public void decrementResourceCounts(CardType cardType, int count)
+    {
+        for (Card card : cards) {
+            if (cardType == card.getCardType()) {
+                card.decrementCardCount(count);
+            }
+        }
+    }
     public void addCard(Card card) {
         this.cards.add(card);
     }
