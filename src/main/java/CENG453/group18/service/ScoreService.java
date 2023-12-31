@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -60,36 +61,46 @@ public class ScoreService {
     {
         LocalDate date = LocalDate.now();
         List<Score> scores = scoreRepository.findScoresByCreationDateAfterOrderByScoreDesc(date.minusDays(7));
-        List<ScoreDTO> scoreDTOS = new ArrayList<>();
-        for(int i=0;i<scores.size();i++)
-        {
-            ScoreDTO temp = new ScoreDTO(scores.get(i).getOwner().getUsername(),scores.get(i).getScore(),scores.get(i).getCreationDate());
-            scoreDTOS.add(temp);
-        }
-        return scoreDTOS;
+
+        Map<String, Integer> summedScores = scores.stream()
+                .collect(Collectors.groupingBy(
+                        score -> score.getOwner().getUsername(),
+                        Collectors.summingInt(Score::getScore)
+                ));
+
+        return summedScores.entrySet().stream()
+                .map(entry -> new ScoreDTO(entry.getKey(), entry.getValue(), null)) // Set creationDate as needed
+                .collect(Collectors.toList());
     }
+
 
     public List<ScoreDTO> getLastMonthScores()
     {
         LocalDate date = LocalDate.now();
         List<Score> scores = scoreRepository.findScoresByCreationDateAfterOrderByScoreDesc(date.minusDays(30));
-        List<ScoreDTO> scoreDTOS = new ArrayList<>();
-        for(int i=0;i<scores.size();i++)
-        {
-            ScoreDTO temp = new ScoreDTO(scores.get(i).getOwner().getUsername(),scores.get(i).getScore(),scores.get(i).getCreationDate());
-            scoreDTOS.add(temp);
-        }
-        return scoreDTOS;
+
+        Map<String, Integer> summedScores = scores.stream()
+                .collect(Collectors.groupingBy(
+                        score -> score.getOwner().getUsername(),
+                        Collectors.summingInt(Score::getScore)
+                ));
+
+        return summedScores.entrySet().stream()
+                .map(entry -> new ScoreDTO(entry.getKey(), entry.getValue(), null)) // Set creationDate as needed
+                .collect(Collectors.toList());
     }
     public List<ScoreDTO> getAllTimeScores()
     {
         List<Score> scores = scoreRepository.findAllByOrderByScoreDesc();
-        List<ScoreDTO> scoreDTOS = new ArrayList<>();
-        for(int i=0;i<scores.size();i++)
-        {
-            ScoreDTO temp = new ScoreDTO(scores.get(i).getOwner().getUsername(),scores.get(i).getScore(),scores.get(i).getCreationDate());
-            scoreDTOS.add(temp);
-        }
-        return scoreDTOS;
+
+        Map<String, Integer> summedScores = scores.stream()
+                .collect(Collectors.groupingBy(
+                        score -> score.getOwner().getUsername(),
+                        Collectors.summingInt(Score::getScore)
+                ));
+
+        return summedScores.entrySet().stream()
+                .map(entry -> new ScoreDTO(entry.getKey(), entry.getValue(), null)) // Set creationDate as needed
+                .collect(Collectors.toList());
     }
 }
