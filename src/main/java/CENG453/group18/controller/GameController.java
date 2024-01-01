@@ -141,4 +141,22 @@ public class GameController {
             return ResponseEntity.status(500).body(null);
         }
     }
+
+    @Operation(summary = "Bot does its automated actions",
+            tags = { "game", "botPlayMove" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {
+                    @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
+            }),
+   })
+    @PostMapping("/botPlay")
+    public ResponseEntity<Game> botPlay(int gameID, int playerNo)
+    {
+        try {
+            gameService.botPlay(gameID, playerNo);
+            return ResponseEntity.ok(gameService.getGameState(gameID));
+        }catch (HttpServerErrorException.InternalServerError e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
 }
