@@ -68,8 +68,10 @@ public class Game {
     @Column(name = "game_type")
     private GameType gameType = GameType.SinglePlayer; // default value
 
-    @Column(name = "current_dice")
-    private Integer currentDice;
+    @Column(name = "current_dice1")
+    private Integer currentDice1;
+    @Column(name = "current_dice2")
+    private Integer currentDice2;
 
     // holds a single card deck for each player and each card deck holds multiple cards belonging to player
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -134,19 +136,8 @@ public class Game {
             playerCardDeckList.get(i).incrementResourceCounts(CardType.GRAIN, 1);
             playerCardDeckList.get(i).incrementResourceCounts(CardType.WOOL, 1);
         }
-}
-
-    // Instead of assigning random value here it can be changed this way:
-    // Roll 2 rice, get sum of them and assign the value here
-    // In current implementation: roll the dice, save value, assign a pair of values
-    // total of which is equal to saved value.
-    public Integer rollTheDice()
-    {
-        Random rand = new Random();
-        currentDice = rand.nextInt(2,13);
-        distributeAllCards(currentDice);
-        return currentDice;
     }
+
 
     // Method to check if a player has enough resources to build a settlement
     public boolean hasEnoughResourcesForSettlement(int playerNo) {

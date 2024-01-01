@@ -153,9 +153,11 @@ public class GameService {
         }
         game.setDiceRolled(true);
         Random rand = new Random();
-        int currentDice = rand.nextInt(2,13);
-        game.setCurrentDice(currentDice);
-        game.distributeAllCards(currentDice);
+        int currentDice1 = rand.nextInt(1,7);
+        int currentDice2 = rand.nextInt(1,7);
+        game.setCurrentDice1(currentDice1);
+        game.setCurrentDice2(currentDice2);
+        game.distributeAllCards(currentDice1 + currentDice2);
         return 0;
     }
 
@@ -206,14 +208,7 @@ public class GameService {
         }
         return -7;
     }
-    @Transactional
-    public void botPlay(int gameID, int playerNo)
-    {
-        // bot plays its turn and ends it
-        rollTheDice(gameID);
-        botBuild(gameID, playerNo);
-        endTurn(gameID);
-    }
+
     @Transactional
     public void botBuild(int gameID, int playerNo) {
         Game game = gameRepository.getGameByGameID(gameID);
