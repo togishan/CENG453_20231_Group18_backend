@@ -100,8 +100,17 @@ public class GameController {
     })
 
     @PostMapping("/playerMove")
-    public ResponseEntity<Game> playerMove(int gameID, String moveType, int edgeOrNodeIndex, int playerNo)
+    public ResponseEntity<Game> playerMove(Integer gameID, String moveType, Integer edgeOrNodeIndex, Integer playerNo)
     {
+        if(gameID == null || edgeOrNodeIndex == null || playerNo == null) {
+            // Print the values
+            System.out.println("gameID: " + gameID);
+            System.out.println("edgeOrNodeIndex: " + edgeOrNodeIndex);
+            System.out.println("playerNo: " + playerNo);
+
+            // return an error response or throw an exception
+            return ResponseEntity.status(400).body(null);
+        }
         try {
             Integer result = gameService.playerMove(gameID, moveType, edgeOrNodeIndex, playerNo);
             Game game = gameService.getGameState(gameID);
