@@ -3,6 +3,8 @@ package CENG453.group18.controller;
 import CENG453.group18.entity.Game;
 import CENG453.group18.entity.Road;
 import CENG453.group18.entity.Settlement;
+import CENG453.group18.entity.Player;
+import CENG453.group18.repository.PlayerRepository;
 import CENG453.group18.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.http.HttpStatus;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -22,6 +25,8 @@ import java.util.Set;
 @RequestMapping("/game")
 public class GameController {
     @Autowired GameService gameService;
+    @Autowired
+    private PlayerRepository playerRepository;
     @Operation(summary = "Retrieve all Games", tags = { "game", "get" })
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {
@@ -44,14 +49,49 @@ public class GameController {
             @ApiResponse(responseCode = "200", content = {
                     @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json") }),
             })
+
     @PostMapping("/createSinglePlayer")
-    public ResponseEntity<Game> createSinglePlayerGame(String username)
+    public ResponseEntity<?> createSinglePlayerGame(String username)
     {
-        System.out.println(username);
+        if(username == null || username.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username cannot be null or empty.");
+        }
+
+        Player player = playerRepository.findPlayerByUsername(username);
+        if(player == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Player not found.");
+        }
+
+        Game existingGame = gameService.findGameByPlayer(player);
+        if(existingGame != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("A game already exists for this player.");
+        }
+
         Game game = gameService.createSinglePlayerGame(username);
 
         return ResponseEntity.ok(game);
     }
+
+    @PostMapping("/joinExistingGame")
+    public ResponseEntity<?> joinExistingGame(String username) {
+        if(username == null || username.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username cannot be null or empty.");
+        }
+
+        Player player = playerRepository.findPlayerByUsername(username);
+        if(player == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Player not found.");
+        }
+
+        Game existingGame = gameService.findGameByPlayer(player);
+        if(existingGame == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No game available to join.");
+        }
+
+        // Return the existing game that the player has already joined
+        return ResponseEntity.ok(existingGame);
+    }
+
     @Operation(summary = "Delete a game instance", tags = { "game", "delete" })
     @ApiResponses({
             @ApiResponse(responseCode = "200"),
@@ -114,6 +154,8 @@ public class GameController {
         try {
             Integer result = gameService.playerMove(gameID, moveType, edgeOrNodeIndex, playerNo);
             Game game = gameService.getGameState(gameID);
+            System.out.println("gameID: " + gameID);
+            System.out.println("Result: " + result);
             if(result == 0)
             {
                 return ResponseEntity.ok(game);

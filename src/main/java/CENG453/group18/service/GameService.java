@@ -253,4 +253,8 @@ public class GameService {
         }
     }
 
+    public Game findGameByPlayer(Player player) {
+        return gameRepository.findByPlayer1OrPlayer2OrPlayer3OrPlayer4(player, player, player, player);
+    }
+
 }
