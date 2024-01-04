@@ -95,11 +95,15 @@ public class GameController {
     @Operation(summary = "Delete a game instance", tags = { "game", "delete" })
     @ApiResponses({
             @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", description = "Bad request, 'id' was not provided"),
             @ApiResponse(responseCode = "500", description = "Not found record with that id or Internal server error")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deleteGame(int id)
+    public ResponseEntity<Boolean> deleteGame(@PathVariable Integer id)
     {
+        if(id == null) {
+            return ResponseEntity.status(400).body(false);
+        }
         Boolean deleted = gameService.deleteGame(id);
         if (deleted) {
             return ResponseEntity.ok(true);  // Deletion was successful
@@ -131,11 +135,12 @@ public class GameController {
                     @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "209", description = "Can't end turn without rolling a dice", content = {
-                    @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
+                @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "210", description = "Game over", content = {
-                    @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
+                @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
             }),
+            @ApiResponse(responseCode = "404", description = "Requested game not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
 
@@ -154,6 +159,9 @@ public class GameController {
         try {
             Integer result = gameService.playerMove(gameID, moveType, edgeOrNodeIndex, playerNo);
             Game game = gameService.getGameState(gameID);
+            if (game == null) {
+                return ResponseEntity.status(404).body(null);
+            }
             System.out.println("gameID: " + gameID);
             System.out.println("Result: " + result);
             if(result == 0)
