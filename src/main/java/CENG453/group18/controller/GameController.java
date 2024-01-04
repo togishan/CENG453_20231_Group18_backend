@@ -141,6 +141,7 @@ public class GameController {
                 @Content(schema = @Schema(implementation = Game.class), mediaType = "application/json")
             }),
             @ApiResponse(responseCode = "404", description = "Requested game not found"),
+            @ApiResponse(responseCode = "409", description = "Conflict, failed to delete game"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
 
@@ -192,11 +193,14 @@ public class GameController {
             {
                 return ResponseEntity.status(209).body(game);
             }
+            else if(result == -7) {
+                return ResponseEntity.status(409).body(game);  // Failed to delete game
+            } 
             else
             {
                 return ResponseEntity.status(209).body(game);
             }
-        }catch (HttpServerErrorException.InternalServerError e) {
+        } catch (HttpServerErrorException.InternalServerError e) {
             return ResponseEntity.status(500).body(null);
         }
     }

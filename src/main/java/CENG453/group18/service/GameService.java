@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 //import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.dao.DataAccessException;
 
 import java.util.*;
 import java.util.function.Function;
@@ -39,15 +40,15 @@ public class GameService {
     }
 
     @Transactional
-    public Boolean deleteGame(int id) {
+    public boolean deleteGame(int id) {
+        if (!gameRepository.existsById(id)) {
+            return false;
+        }
+
         try {
-            if (!gameRepository.existsGameByGameID(id))
-            {
-                return false;
-            }
-            gameRepository.deleteGameByGameID(id);
+            gameRepository.deleteById(id);
             return true;  // Deletion was successful
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             // Log the exception or handle it as needed
             return false;  // Deletion failed
         }
@@ -198,16 +199,38 @@ public class GameService {
 
     private Integer endGame(int gameID) {
         Game game = gameRepository.getGameByGameID(gameID);
+        // We already checked if the game exists, no need to check again
 
-        scoreService.saveScore(game.getPlayer1().getUsername(), game.getPlayer1Score());
-        if (game.getGameType() == GameType.Multiplayer) {
-            scoreService.saveScore(game.getPlayer2().getUsername(), game.getPlayer2Score());
-            scoreService.saveScore(game.getPlayer3().getUsername(), game.getPlayer3Score());
-            scoreService.saveScore(game.getPlayer4().getUsername(), game.getPlayer4Score());
-
+        // Check if the dice is rolled
+        if(game.getDiceRolled())
+        {
+            return -5;
         }
-        return -7;
+
+        // Save the score of player1
+        savePlayerScore(game.getPlayer1(), game.getPlayer1Score());
+
+        // If the game is multiplayer, save the scores of the other players
+        if (game.getGameType() == GameType.Multiplayer) {
+            savePlayerScore(game.getPlayer2(), game.getPlayer2Score());
+            savePlayerScore(game.getPlayer3(), game.getPlayer3Score());
+            savePlayerScore(game.getPlayer4(), game.getPlayer4Score());
+        }
+
+        // Delete the game
+        if (!deleteGame(gameID)) {
+            return -6;  // Failed to delete game
+        }
+
+        return 0;  // Game ended and deleted successfully
     }
+
+    private void savePlayerScore(Player player, int score) {
+        if (player != null) {
+            scoreService.saveScore(player.getUsername(), score);
+        }
+    }
+
 
     @Transactional
     public void botBuild(int gameID, int playerNo) {
@@ -258,8 +281,7 @@ public class GameService {
     }
 
     public boolean doesGameExist(Integer gameID) {
-        Optional<Game> gameOptional = gameRepository.findById(gameID);
-        return gameOptional.isPresent();
+        return gameRepository.existsById(gameID);
     }
 
 }
