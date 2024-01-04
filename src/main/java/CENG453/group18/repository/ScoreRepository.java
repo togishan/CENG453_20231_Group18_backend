@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface ScoreRepository extends JpaRepository<Score, Long> {
+public interface ScoreRepository extends JpaRepository<Score, Integer> {
     List<Score> findAllByOrderByScoreDesc();
     List<Score> findScoresByCreationDateAfterOrderByScoreDesc(LocalDate date);
 }

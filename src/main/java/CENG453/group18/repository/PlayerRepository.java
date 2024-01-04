@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PlayerRepository extends JpaRepository<Player, Long>{
+public interface PlayerRepository extends JpaRepository<Player, Integer>{
     Player findPlayerByUsername(String username);
     Player findPlayerByEmail(String email);
     Player findPlayerBySessionKey(String sessionKey);
