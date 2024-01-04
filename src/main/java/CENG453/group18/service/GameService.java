@@ -257,4 +257,9 @@ public class GameService {
         return gameRepository.findByPlayer1OrPlayer2OrPlayer3OrPlayer4(player, player, player, player);
     }
 
+    public boolean doesGameExist(Integer gameID) {
+        Optional<Game> gameOptional = gameRepository.findById(gameID);
+        return gameOptional.isPresent();
+    }
+
 }

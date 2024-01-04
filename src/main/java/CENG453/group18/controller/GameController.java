@@ -157,11 +157,11 @@ public class GameController {
             return ResponseEntity.status(400).body(null);
         }
         try {
-            Integer result = gameService.playerMove(gameID, moveType, edgeOrNodeIndex, playerNo);
-            Game game = gameService.getGameState(gameID);
-            if (game == null) {
+            if (!gameService.doesGameExist(gameID)) {
                 return ResponseEntity.status(404).body(null);
             }
+            Integer result = gameService.playerMove(gameID, moveType, edgeOrNodeIndex, playerNo);
+            Game game = gameService.getGameState(gameID);
             System.out.println("gameID: " + gameID);
             System.out.println("Result: " + result);
             if(result == 0)
