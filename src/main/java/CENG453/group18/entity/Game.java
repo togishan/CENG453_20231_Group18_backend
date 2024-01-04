@@ -95,7 +95,7 @@ public class Game {
         this.player4Score = 1;
         this.currentLongestRoadLength = 0;
         this.currentLongestRoadOwnerPlayerNo = 0;
-        this.diceRolled = true;
+        this.diceRolled = false;
         if(gameType == GameType.SinglePlayer) {
             this.player1 = player1;
         }
