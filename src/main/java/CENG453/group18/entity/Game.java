@@ -1,12 +1,11 @@
 package CENG453.group18.entity;
 
-
-import CENG453.group18.dictionary.GameBoardDictionary;
+//import CENG453.group18.dictionary.GameBoardDictionary;
 import CENG453.group18.dictionary.NodeDictionaryObject;
 import CENG453.group18.enums.CardType;
 import CENG453.group18.enums.GameType;
 
-import CENG453.group18.repository.PlayerRepository;
+//import CENG453.group18.repository.PlayerRepository;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,9 +16,9 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+//import java.util.Random;
 import java.util.Map;
-import java.util.HashMap;
+//import java.util.HashMap;
 
 
 @Getter
@@ -191,10 +190,12 @@ public class Game {
         //todo
     }
 
+    /* 
     private void endGame()
     {
 
     }
+    */
 
     // once the dice is rolled add cards to card decks of players, depend on their settlement placements
     public void distributeAllCards(int currentDice)

@@ -1,8 +1,8 @@
 package CENG453.group18.controller;
 
 import CENG453.group18.entity.Game;
-import CENG453.group18.entity.Road;
-import CENG453.group18.entity.Settlement;
+//import CENG453.group18.entity.Road;
+//import CENG453.group18.entity.Settlement;
 import CENG453.group18.entity.Player;
 import CENG453.group18.repository.PlayerRepository;
 import CENG453.group18.service.GameService;
@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.http.HttpStatus;
 
-import java.sql.SQLException;
+//import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
+//import java.util.Set;
 
 @RestController
 @RequestMapping("/game")

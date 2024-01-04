@@ -1,13 +1,15 @@
 package CENG453.group18.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+//import com.fasterxml.jackson.annotation.JsonIgnore;
+//import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
+//import java.util.ArrayList;
+//import java.util.List;
+
+import java.util.Objects;
 
 @Transactional
 @Setter
@@ -47,4 +49,11 @@ public class Player {
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        // This method was added to remove the warning related to @Data annotation.
+        // @Data annotation includes @EqualsAndHashCode, which generates equals() and hashCode() methods automatically.
+        // However, since we have manually defined equals() method, we also need to manually define hashCode() method to maintain the contract between equals() and hashCode().
+        return Objects.hash(playerID);
+    }
 }

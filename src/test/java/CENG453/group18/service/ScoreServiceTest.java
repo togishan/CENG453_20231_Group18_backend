@@ -1,9 +1,9 @@
 package CENG453.group18.service;
 
 
-import CENG453.group18.DTO.RegisterDTO;
+//import CENG453.group18.DTO.RegisterDTO;
 import CENG453.group18.DTO.ScoreDTO;
-import CENG453.group18.entity.Player;
+//import CENG453.group18.entity.Player;
 import CENG453.group18.entity.Score;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.MethodOrderer;
@@ -17,7 +17,7 @@ import org.springframework.test.annotation.Rollback;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -32,14 +32,14 @@ public class ScoreServiceTest
     @Autowired
     ScoreService scoreService;
     @Autowired
-    private PlayerService playerService;
+    //private PlayerService playerService;
 
     @Test
     @Order(1)
     @Rollback(false)
     void init() throws NoSuchAlgorithmException {
-        RegisterDTO appropriateRegisterDTO1 = new RegisterDTO("oguzhan", "oguzhan@metu.edu.tr","123");
-        RegisterDTO appropriateRegisterDTO2 = new RegisterDTO("oguzhan2", "oguzhan2@metu.edu.tr","321");
+        //RegisterDTO appropriateRegisterDTO1 = new RegisterDTO("oguzhan", "oguzhan@metu.edu.tr","123");
+        //RegisterDTO appropriateRegisterDTO2 = new RegisterDTO("oguzhan2", "oguzhan2@metu.edu.tr","321");
     }
 
     @Test

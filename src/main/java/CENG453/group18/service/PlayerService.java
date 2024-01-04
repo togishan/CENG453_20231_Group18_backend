@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+//import java.security.SecureRandom;
 
-import java.util.Base64;
+//import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
@@ -21,19 +21,19 @@ import java.util.logging.Logger;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMultipart;
+//import javax.mail.internet.MimeBodyPart;
+//import javax.mail.internet.MimeMultipart;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
+//import javax.activation.DataHandler;
+//import javax.activation.DataSource;
+//import javax.activation.FileDataSource;
 
 
 @Service
 public class PlayerService {
     @Autowired
     private PlayerRepository playerRepository;
-    private static final int TOKEN_LENGTH = 32;
+    //private static final int TOKEN_LENGTH = 32;
     private static final Logger LOGGER = Logger.getLogger(PlayerService.class.getName());
 
     public List<Player> getAllPlayers() {

@@ -1,9 +1,9 @@
 package CENG453.group18.controller;
 
 import CENG453.group18.DTO.ScoreDTO;
-import CENG453.group18.entity.Player;
+//import CENG453.group18.entity.Player;
 import CENG453.group18.entity.Score;
-import CENG453.group18.service.PlayerService;
+//import CENG453.group18.service.PlayerService;
 import CENG453.group18.service.ScoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.util.Date;
+//import java.time.LocalDate;
+//import java.util.Date;
 import java.util.List;
 
 @RestController

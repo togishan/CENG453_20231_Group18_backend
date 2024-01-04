@@ -132,7 +132,7 @@ public class PlayerServiceTest
         String resetKey = null;
         String previousPassword = null;
         String newPassword = null;
-        boolean bool1 = playerService.sendEmail("oguzhan@metu.edu.tr");
+        //boolean bool1 = playerService.sendEmail("oguzhan@metu.edu.tr");
         List<Player> players = playerService.getAllPlayers();
 
         for (int i = 0; i < players.size(); i++) {
