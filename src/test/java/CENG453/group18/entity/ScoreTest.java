@@ -12,7 +12,7 @@ public class ScoreTest
     private Score score2;
     private Score score3;
     private Score score4;
-    private Score score5;
+    //private Score score5;
 
     @BeforeEach
     void init()

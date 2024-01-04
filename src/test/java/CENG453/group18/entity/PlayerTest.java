@@ -1,7 +1,7 @@
 package CENG453.group18.entity;
 
 import org.junit.jupiter.api.*;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PlayerTest
