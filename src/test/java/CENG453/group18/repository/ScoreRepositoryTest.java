@@ -1,6 +1,6 @@
 package CENG453.group18.repository;
 
-import CENG453.group18.entity.Player;
+//import CENG453.group18.entity.Player;
 import CENG453.group18.entity.Score;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;

@@ -34,7 +34,7 @@ public class PlayerRepositoryTest
     @Order(2)
     void testFindPlayerByUsername()
     {
-        Player existingPlayer = playerRepository.findPlayerByUsername("oguzhan");
+        //Player existingPlayer = playerRepository.findPlayerByUsername("oguzhan");
         Player notExistingPlayer = playerRepository.findPlayerByUsername("oguz");
         assertNull(notExistingPlayer);
     }
