@@ -173,22 +173,6 @@ public class Game {
                resourceCounts.getOrDefault(CardType.GRAIN, 0) >= 2;
     }
 
-    // end the turn and notify the players whose turn is started
-    public Integer endTurn()
-    {
-        turn = turn%4 + 1;
-        setLongestRoadInTheGame();
-        if(player1Score >= 8)
-        {
-
-        }
-        // set the longest road
-        // check winner
-        // send log to the frontend
-        // if there is a winner end the game and set the scores
-        return turn;
-        //todo
-    }
 
     /* 
     private void endGame()
