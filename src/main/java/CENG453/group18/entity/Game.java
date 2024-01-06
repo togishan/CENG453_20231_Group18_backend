@@ -1,7 +1,6 @@
 package CENG453.group18.entity;
 
 //import CENG453.group18.dictionary.GameBoardDictionary;
-import CENG453.group18.dictionary.GameBoardDictionary;
 import CENG453.group18.dictionary.NodeDictionaryObject;
 import CENG453.group18.enums.CardType;
 import CENG453.group18.enums.GameType;
@@ -127,6 +126,10 @@ public class Game {
             }
             playerCardDeckList.add(playerCardDeck);
         }
+    }
+
+    public Integer getTurn() {
+        return this.turn;
     }
 
     private void distributeInitialCards() {

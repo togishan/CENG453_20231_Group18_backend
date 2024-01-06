@@ -197,6 +197,22 @@ public class GameController {
         return ResponseEntity.ok(game);
     }
 
+    @PostMapping("/turn")
+    public ResponseEntity<?> turn(Integer gameId) {
+        if (gameId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("GameId cannot be null.");
+        }
+
+        Game game = gameService.getGameState(gameId);
+        if (game == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found for id: " + gameId);
+        }
+        
+        int turnResult = gameService.turn(gameId);
+
+        return ResponseEntity.ok(turnResult);
+    }
+
     @Autowired
     private GameRepository gameRepository;
 

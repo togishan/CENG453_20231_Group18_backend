@@ -59,6 +59,12 @@ public class GameService {
         return gameRepository.save(game);
     }
 
+    public int turn(int gameId) {
+        Game game = gameRepository.getGameByGameID(gameId);
+        
+        return game.getTurn();
+    }
+
     public boolean cheat(int gameId, int playerNo, Map<CardType, Integer> requested) {
         Game game = gameRepository.getGameByGameID(gameId);
         if (game == null) {
