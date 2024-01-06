@@ -1,6 +1,7 @@
 package CENG453.group18.service;
 
 import CENG453.group18.entity.*;
+import CENG453.group18.enums.CardType;
 import CENG453.group18.enums.GameType;
 import CENG453.group18.repository.GameBoardRepository;
 import CENG453.group18.repository.GameRepository;
@@ -56,6 +57,33 @@ public class GameService {
         }
 
         return gameRepository.save(game);
+    }
+
+    public int createTradeOffer(int gameId, int playerNo, Map<CardType, Integer> offered, Map<CardType, Integer> requested) {
+        Game game = gameRepository.getGameByGameID(gameId);
+        if (game == null) {
+            return -1;
+        }
+
+        return game.createTradeOffer(playerNo, offered, requested);
+    }
+
+    public boolean acceptTradeOffer(int gameId, int playerNo, int tradeOfferId) {
+        Game game = gameRepository.getGameByGameID(gameId);
+        if (game == null) {
+            return false;
+        }
+
+        return game.acceptTradeOffer(playerNo, tradeOfferId);
+    }
+
+    public boolean deleteTradeOffer(int gameId, int playerNo, int tradeOfferId) {
+        Game game = gameRepository.getGameByGameID(gameId);
+        if (game == null) {
+            return false;
+        }
+
+        return game.deleteTradeOffer(tradeOfferId);
     }
 
     public List<Game> getAllGames()

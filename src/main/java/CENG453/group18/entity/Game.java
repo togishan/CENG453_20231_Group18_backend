@@ -19,6 +19,7 @@ import java.util.List;
 //import java.util.Random;
 import java.util.Map;
 //import java.util.HashMap;
+import java.util.stream.Collectors;
 
 
 @Getter
@@ -85,6 +86,8 @@ public class Game {
     @Column(name = "diceRolled")
     private Boolean diceRolled;
 
+    private List<TradeOffer> tradeOffers;
+
     public Game(Player player1, Player player2, Player player3, Player player4, GameType gameType) {
         this.gameboard = new GameBoard();
         this.turn = 1;
@@ -105,6 +108,8 @@ public class Game {
             this.player3 = player3;
             this.player4 = player4;
         }
+
+        this.tradeOffers = new ArrayList<>();
 
         initializePlayerCardDecks();
         distributeInitialCards();
@@ -135,6 +140,103 @@ public class Game {
             playerCardDeckList.get(i).incrementResourceCounts(CardType.GRAIN, 1);
             playerCardDeckList.get(i).incrementResourceCounts(CardType.WOOL, 1);
         }
+    }
+
+    public int createTradeOffer(int playerNo, Map<CardType, Integer> offered, Map<CardType, Integer> requested) {
+        TradeOffer tradeOffer = new TradeOffer(playerNo, offered, requested);
+        this.tradeOffers.add(tradeOffer);
+
+        // Create a string representation of the offered and requested cards
+        String offeredString = offered.entrySet().stream()
+            .map(entry -> entry.getKey() + ": " + entry.getValue())
+            .collect(Collectors.joining(", "));
+        String requestedString = requested.entrySet().stream()
+            .map(entry -> entry.getKey() + ": " + entry.getValue())
+            .collect(Collectors.joining(", "));
+
+        // Add an event to the game board
+        gameboard.addEvent("Player " + playerNo + " created a trade offer. Offered: " + offeredString + ". Requested: " + requestedString);
+
+        return tradeOffer.getTradeOfferID();
+    }
+    
+    public boolean acceptTradeOffer(int playerNo, int tradeOfferID) {
+        // Find the trade offer with the given ID
+        TradeOffer tradeOffer = this.tradeOffers.stream()
+            .filter(offer -> offer.getTradeOfferID() == tradeOfferID)
+            .findFirst()
+            .orElse(null);
+
+        // If no trade offer with the given ID was found, return false
+        if (tradeOffer == null) {
+            return false;
+        }
+
+        // Get the player's cards
+        Map<CardType, Integer> playerCards = playerCardDeckList.get(playerNo - 1).getResourceCounts();
+
+        // Check if the player has enough cards to accept the trade offer
+        if (!hasEnoughCards(playerCards, tradeOffer.getRequested())) {
+            return false;
+        }
+
+        // Get the cards of the player who created the trade offer
+        Map<CardType, Integer> offerCreatorCards = playerCardDeckList.get(tradeOffer.getPlayerNo() - 1).getResourceCounts();
+
+        // Check if the player who created the trade offer has enough cards to fulfill the offer
+        if (!hasEnoughCards(offerCreatorCards, tradeOffer.getOffered())) {
+            return false;
+        }
+
+        // Both players have enough cards to proceed with the trade
+        // Subtract the requested cards from the player's cards and add the offered cards
+        updatePlayerCards(playerNo, tradeOffer.getRequested(), tradeOffer.getOffered());
+
+        // Subtract the offered cards from the offer creator's cards and add the requested cards
+        updatePlayerCards(tradeOffer.getPlayerNo(), tradeOffer.getOffered(), tradeOffer.getRequested());
+
+        // Remove the trade offer from the list
+        this.tradeOffers.remove(tradeOffer);
+
+        // Add an event to the game board
+        gameboard.addEvent("Player " + playerNo + " accepted trade offer " + tradeOfferID + ".");
+
+        // Return true to indicate that the trade offer was accepted
+        return true;
+    }
+
+    private void updatePlayerCards(int playerNo, Map<CardType, Integer> subtractCards, Map<CardType, Integer> addCards) {
+        PlayerCardDeck playerDeck = playerCardDeckList.get(playerNo - 1);
+
+        subtractCards.forEach((cardType, count) ->
+            playerDeck.decrementResourceCounts(cardType, count));
+
+        addCards.forEach((cardType, count) ->
+            playerDeck.incrementResourceCounts(cardType, count));
+    }
+
+    private boolean hasEnoughCards(Map<CardType, Integer> playerCards, Map<CardType, Integer> requestedCards) {
+        return requestedCards.entrySet().stream()
+            .allMatch(entry -> playerCards.getOrDefault(entry.getKey(), 0) >= entry.getValue());
+    }
+
+    public boolean deleteTradeOffer(int tradeOfferID) {
+        // Find the trade offer with the given ID
+        for (TradeOffer tradeOffer : this.tradeOffers) {
+            if (tradeOffer.getTradeOfferID() == tradeOfferID) {
+                // Remove the trade offer from the list
+                this.tradeOffers.remove(tradeOffer);
+
+                // Add an event to the game board
+                gameboard.addEvent("Trade offer " + tradeOfferID + " was deleted.");
+
+                // Return true to indicate that the trade offer was found and deleted
+                return true;
+            }
+        }
+
+        // Return false to indicate that no trade offer with the given ID was found
+        return false;
     }
 
 

@@ -4,6 +4,7 @@ import CENG453.group18.entity.Game;
 //import CENG453.group18.entity.Road;
 //import CENG453.group18.entity.Settlement;
 import CENG453.group18.entity.Player;
+import CENG453.group18.enums.CardType;
 import CENG453.group18.repository.PlayerRepository;
 import CENG453.group18.repository.GameRepository;
 import CENG453.group18.service.GameService;
@@ -21,7 +22,8 @@ import org.springframework.http.HttpStatus;
 //import java.sql.SQLException;
 import java.util.List;
 //import java.util.Set;
-
+import java.util.Map;
+import java.util.EnumMap;
 import java.util.ArrayList;
 
 @RestController
@@ -104,6 +106,57 @@ public class GameController {
         Game game = gameService.createMultiPlayerGame(players);
 
         return ResponseEntity.ok(game);
+    }
+
+    @PostMapping("/createTradeOffer")
+    public ResponseEntity<?> createTradeOffer(
+        int gameId, int playerNo,
+        int offeredBrick, int offeredLumber, int offeredOre,
+        int offeredGrain, int offeredWool, int requestedBrick,
+        int requestedLumber, int requestedOre, int requestedGrain,
+        int requestedWool) {
+
+        // Create maps to hold the offered and requested amounts for each card type
+        Map<CardType, Integer> offered = new EnumMap<>(CardType.class);
+        offered.put(CardType.BRICK, offeredBrick);
+        offered.put(CardType.LUMBER, offeredLumber);
+        offered.put(CardType.ORE, offeredOre);
+        offered.put(CardType.GRAIN, offeredGrain);
+        offered.put(CardType.WOOL, offeredWool);
+
+        Map<CardType, Integer> requested = new EnumMap<>(CardType.class);
+        requested.put(CardType.BRICK, requestedBrick);
+        requested.put(CardType.LUMBER, requestedLumber);
+        requested.put(CardType.ORE, requestedOre);
+        requested.put(CardType.GRAIN, requestedGrain);
+        requested.put(CardType.WOOL, requestedWool);
+
+        // Create the trade offer
+        int tradeOfferId = gameService.createTradeOffer(gameId, playerNo, offered, requested);
+
+        return ResponseEntity.ok(tradeOfferId);
+    }
+
+    @PostMapping("/acceptTradeOffer")
+    public ResponseEntity<?> acceptTradeOffer(int gameId, int playerNo, int tradeOfferId) {
+        boolean success = gameService.acceptTradeOffer(gameId, playerNo, tradeOfferId);
+
+        if (success) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/deleteTradeOffer")
+    public ResponseEntity<?> deleteTradeOffer(int gameId, int playerNo, int tradeOfferId) {
+        boolean success = gameService.deleteTradeOffer(gameId, playerNo, tradeOfferId);
+
+        if (success) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/getGame")
