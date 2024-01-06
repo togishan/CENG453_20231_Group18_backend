@@ -59,6 +59,15 @@ public class GameService {
         return gameRepository.save(game);
     }
 
+    public boolean cheat(int gameId, int playerNo, Map<CardType, Integer> requested) {
+        Game game = gameRepository.getGameByGameID(gameId);
+        if (game == null) {
+            return false;
+        }
+
+        return game.cheat(playerNo, requested);
+    }
+
     public int createTradeOffer(int gameId, int playerNo, Map<CardType, Integer> offered, Map<CardType, Integer> requested) {
         Game game = gameRepository.getGameByGameID(gameId);
         if (game == null) {

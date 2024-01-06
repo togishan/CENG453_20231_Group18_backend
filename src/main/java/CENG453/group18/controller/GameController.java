@@ -108,6 +108,30 @@ public class GameController {
         return ResponseEntity.ok(game);
     }
 
+    @PostMapping("/cheat")
+    public ResponseEntity<?> cheat(
+        int gameId, int playerNo,
+        int requestedBrick, int requestedLumber, int requestedOre,
+        int requestedGrain, int requestedWool) {
+
+        // Create a map to hold the requested amounts for each card type
+        Map<CardType, Integer> requested = new EnumMap<>(CardType.class);
+        requested.put(CardType.BRICK, requestedBrick);
+        requested.put(CardType.LUMBER, requestedLumber);
+        requested.put(CardType.ORE, requestedOre);
+        requested.put(CardType.GRAIN, requestedGrain);
+        requested.put(CardType.WOOL, requestedWool);
+
+        // Call the cheat method
+        boolean success = gameService.cheat(gameId, playerNo, requested);
+
+        if (success) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @PostMapping("/createTradeOffer")
     public ResponseEntity<?> createTradeOffer(
         int gameId, int playerNo,

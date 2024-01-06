@@ -141,8 +141,12 @@ public class Game {
             playerCardDeckList.get(i).incrementResourceCounts(CardType.WOOL, 1);
         }
     }
-
     public int createTradeOffer(int playerNo, Map<CardType, Integer> offered, Map<CardType, Integer> requested) {
+        // Check if it's the player's turn
+        if (playerNo != this.turn) {
+            throw new IllegalStateException("It's not Player " + playerNo + "'s turn.");
+        }
+
         TradeOffer tradeOffer = new TradeOffer(playerNo, offered, requested);
         this.tradeOffers.add(tradeOffer);
 
@@ -206,13 +210,28 @@ public class Game {
     }
 
     private void updatePlayerCards(int playerNo, Map<CardType, Integer> subtractCards, Map<CardType, Integer> addCards) {
+        // Get the PlayerCardDeck for the specified player
         PlayerCardDeck playerDeck = playerCardDeckList.get(playerNo - 1);
 
+        // For each card type in the subtractCards map, decrement the count in the player's deck
         subtractCards.forEach((cardType, count) ->
             playerDeck.decrementResourceCounts(cardType, count));
 
+        // For each card type in the addCards map, increment the count in the player's deck
         addCards.forEach((cardType, count) ->
             playerDeck.incrementResourceCounts(cardType, count));
+    }
+
+    public boolean cheat(int playerNo, Map<CardType, Integer> requested) {
+        // Get the PlayerCardDeck for the specified player
+        PlayerCardDeck playerDeck = playerCardDeckList.get(playerNo - 1);
+
+        // For each requested resource, increment the count in the player's deck
+        requested.forEach((cardType, count) ->
+            playerDeck.incrementResourceCounts(cardType, count));
+        
+        // Return true to indicate that the cheat was successful
+        return true;
     }
 
     private boolean hasEnoughCards(Map<CardType, Integer> playerCards, Map<CardType, Integer> requestedCards) {
