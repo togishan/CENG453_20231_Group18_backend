@@ -198,7 +198,7 @@ public class GameController {
             } 
             else
             {
-                return ResponseEntity.status(209).body(game);
+                return ResponseEntity.status(210).body(game);
             }
         } catch (HttpServerErrorException.InternalServerError e) {
             return ResponseEntity.status(500).body(null);

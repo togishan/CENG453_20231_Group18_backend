@@ -201,11 +201,6 @@ public class GameService {
         Game game = gameRepository.getGameByGameID(gameID);
         // We already checked if the game exists, no need to check again
 
-        // Check if the dice is rolled
-        if(game.getDiceRolled())
-        {
-            return -5;
-        }
 
         // Save the score of player1
         savePlayerScore(game.getPlayer1(), game.getPlayer1Score());
@@ -219,10 +214,10 @@ public class GameService {
 
         // Delete the game
         if (!deleteGame(gameID)) {
-            return -6;  // Failed to delete game
+            return -7;  // Failed to delete game
         }
 
-        return 0;  // Game ended and deleted successfully
+        return -8;  // Game ended and deleted successfully
     }
 
     private void savePlayerScore(Player player, int score) {
