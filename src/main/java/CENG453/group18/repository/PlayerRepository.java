@@ -12,4 +12,5 @@ public interface PlayerRepository extends JpaRepository<Player, Integer>{
     Player findPlayerByResetKey(String resetKey);
     boolean existsPlayerByUsername(String username);
     boolean existsPlayerByEmail(String email);
+    void deletePlayerByUsername(String username);
 }

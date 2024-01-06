@@ -23,6 +23,11 @@ public class ScoreService {
     @Autowired
     private PlayerRepository playerRepository;
 
+    public void deleteScore(String username)
+    {
+        scoreRepository.deleteAllScoreByOwnerUsername(username);
+    }
+
     // For only testing purposes
     public Score saveScoreByAdjustingDate(String username, int playerScore, LocalDate date)
     {
@@ -61,7 +66,7 @@ public class ScoreService {
     {
         LocalDate date = LocalDate.now();
         List<Score> scores = scoreRepository.findScoresByCreationDateAfterOrderByScoreDesc(date.minusDays(7));
-
+        System.out.println(scores);
         Map<String, Integer> summedScores = scores.stream()
                 .collect(Collectors.groupingBy(
                         score -> score.getOwner().getUsername(),

@@ -36,6 +36,10 @@ public class PlayerService {
     //private static final int TOKEN_LENGTH = 32;
     private static final Logger LOGGER = Logger.getLogger(PlayerService.class.getName());
 
+    public void deletePlayer(String username)
+    {
+        playerRepository.deletePlayerByUsername(username);
+    }
     public List<Player> getAllPlayers() {
         return (List<Player>) playerRepository.findAll();
     }

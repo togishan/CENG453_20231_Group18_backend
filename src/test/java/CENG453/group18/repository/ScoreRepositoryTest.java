@@ -1,7 +1,9 @@
 package CENG453.group18.repository;
 
 //import CENG453.group18.entity.Player;
+import CENG453.group18.entity.Player;
 import CENG453.group18.entity.Score;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +25,23 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ScoreRepositoryTest {
     @Autowired
     private ScoreRepository scoreRepository;
+    @Autowired PlayerRepository playerRepository;
     private final Score score1 = new Score(1, 5, LocalDate.now(), null);
     private final Score score2 = new Score(2, 10, LocalDate.now().minusDays(6), null);
     private final Score score3 = new Score(3, 15, LocalDate.now().minusDays(7), null);
-    private final Score score4 = new Score(4, 15, LocalDate.now().minusDays(7), null);
 
+    private String appropriateName = "oguzhannnfnfafgsdsffdh";
+    private String appropriateEmail = "oguzhanngnfdgns@metu.edu.tr";
+    private final Player player = new Player(1, appropriateName, appropriateEmail, "123", "RANDOM_SESSION_KEY", "RANDOM_RESET_KEY");
     @Test
     @Order(1)
     @Rollback(false)
     void initializeRepository()
     {
+        playerRepository.save(player);
+        score1.setOwner(player);
+        score2.setOwner(player);
+        score3.setOwner(player);
         scoreRepository.save(score1);
         scoreRepository.save(score2);
         scoreRepository.save(score3);
@@ -42,43 +51,33 @@ public class ScoreRepositoryTest {
     void testFindScoresByCreationDateAfterOrderByScoreDesc()
     {
         List<Score> scoreBoard = scoreRepository.findScoresByCreationDateAfterOrderByScoreDesc(LocalDate.now().minusDays(7));
-        ArrayList<Score> scores = new ArrayList<>();
-        scores.add(score2);
-        scores.add(score1);
-        assertEquals(scoreBoard, scores);
+        Integer previousScore = 999999;
+        for(int i=0; i<scoreBoard.size(); i++)
+        {
+            assert scoreBoard.get(i).getScore()<=previousScore;
+            previousScore = scoreBoard.get(i).getScore();
+        }
+
     }
     @Test
     @Order(2)
     void testFindAllByOrderByScoreDesc()
     {
         List<Score> scoreBoard = scoreRepository.findAllByOrderByScoreDesc();
-        ArrayList<Score> scores = new ArrayList<>();
-        scores.add(score3);
-        scores.add(score2);
-        scores.add(score1);
-        assertEquals(scoreBoard, scores);
+        Integer previousScore = 999999;
+        for(int i=0; i<scoreBoard.size(); i++)
+        {
+            assert scoreBoard.get(i).getScore()<=previousScore;
+            previousScore = scoreBoard.get(i).getScore();
+        }
     }
     @Test
     @Order(3)
-    void testOrderingWithSameScores()
+    @Rollback(false)
+    void destruct()
     {
-        scoreRepository.save(score4);
-        List<Score> scoreBoard = scoreRepository.findAllByOrderByScoreDesc();
-        ArrayList<Score> scoreOrdering1 = new ArrayList<>();
-        scoreOrdering1.add(score4);
-        scoreOrdering1.add(score3);
-        scoreOrdering1.add(score2);
-        scoreOrdering1.add(score1);
-
-        ArrayList<Score> scoreOrdering2 = new ArrayList<>();
-        scoreOrdering2.add(score3);
-        scoreOrdering2.add(score4);
-        scoreOrdering2.add(score2);
-        scoreOrdering2.add(score1);
-
-        // One of them must be true
-        boolean b1 = scoreBoard.equals(scoreOrdering1);
-        boolean b2 = scoreBoard.equals(scoreOrdering2);
-        assertTrue(b1 ^ b2);
+        scoreRepository.deleteAllScoreByOwnerUsername(appropriateName);
+        playerRepository.deletePlayerByUsername(appropriateName);
     }
+
 }

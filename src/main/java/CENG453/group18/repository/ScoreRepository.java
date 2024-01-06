@@ -12,4 +12,6 @@ import java.util.List;
 public interface ScoreRepository extends JpaRepository<Score, Integer> {
     List<Score> findAllByOrderByScoreDesc();
     List<Score> findScoresByCreationDateAfterOrderByScoreDesc(LocalDate date);
+
+    void deleteAllScoreByOwnerUsername(String username);
 }

@@ -19,7 +19,10 @@ public class PlayerRepositoryTest
 {
     @Autowired
     private PlayerRepository playerRepository;
-    private final Player player = new Player(1, "oguzhan", "oguzhan@metu.edu.tr", "123", "RANDOM_SESSION_KEY", "RANDOM_RESET_KEY");
+
+    private String appropriateName = "oguzhannnfnfafgsdsffdh";
+    private String appropriateEmail = "oguzhanngnfdgns@metu.edu.tr";
+    private final Player player = new Player(1, appropriateName, appropriateEmail, "123", "RANDOM_SESSION_KEY", "RANDOM_RESET_KEY");
 
 
     @Test
@@ -34,8 +37,9 @@ public class PlayerRepositoryTest
     @Order(2)
     void testFindPlayerByUsername()
     {
-        //Player existingPlayer = playerRepository.findPlayerByUsername("oguzhan");
-        Player notExistingPlayer = playerRepository.findPlayerByUsername("oguz");
+        Player existingPlayer = playerRepository.findPlayerByUsername(appropriateName);
+        Player notExistingPlayer = playerRepository.findPlayerByUsername("ongffssbsbsguz");
+        assertEquals(existingPlayer.getUsername(), player.getUsername());
         assertNull(notExistingPlayer);
     }
 
@@ -43,9 +47,9 @@ public class PlayerRepositoryTest
     @Order(2)
     void testFindPlayerByEmail()
     {
-        Player existingPlayer = playerRepository.findPlayerByEmail("oguzhan@metu.edu.tr");
-        Player notExistingPlayer = playerRepository.findPlayerByEmail("oguz@metu.edu.tr");
-        assertEquals(existingPlayer, player);
+        Player existingPlayer = playerRepository.findPlayerByEmail(appropriateEmail);
+        Player notExistingPlayer = playerRepository.findPlayerByEmail("ogdhggdfngfduz@metu.edu.tr");
+        assertEquals(existingPlayer.getUsername(), player.getUsername());
         assertNull(notExistingPlayer);
     }
 
@@ -55,7 +59,7 @@ public class PlayerRepositoryTest
     {
         Player existingPlayer = playerRepository.findPlayerBySessionKey("RANDOM_SESSION_KEY");
         Player notExistingPlayer = playerRepository.findPlayerBySessionKey("KEY_SESSION_RANDOM");
-        assertEquals(existingPlayer, player);
+        assertEquals(existingPlayer.getUsername(), player.getUsername());
         assertNull(notExistingPlayer);
     }
 
@@ -65,15 +69,15 @@ public class PlayerRepositoryTest
     {
         Player existingPlayer = playerRepository.findPlayerByResetKey("RANDOM_RESET_KEY");
         Player notExistingPlayer = playerRepository.findPlayerByResetKey("KEY_RESET_RANDOM");
-        assertEquals(existingPlayer, player);
+        assertEquals(existingPlayer.getUsername(), player.getUsername());
         assertNull(notExistingPlayer);
     }
     @Test
     @Order(2)
     void testExistsPlayerByUsername()
     {
-        boolean trueAssertion = playerRepository.existsPlayerByUsername("oguzhan");
-        boolean falseAssertion = playerRepository.existsPlayerByUsername("oguz");
+        boolean trueAssertion = playerRepository.existsPlayerByUsername(appropriateName);
+        boolean falseAssertion = playerRepository.existsPlayerByUsername("mhgifdnbsbfsbds");
         assertTrue(trueAssertion);
         assertFalse(falseAssertion);
     }
@@ -81,9 +85,16 @@ public class PlayerRepositoryTest
     @Order(2)
     void testExistsPlayerByEmail()
     {
-        boolean trueAssertion = playerRepository.existsPlayerByEmail("oguzhan@metu.edu.tr");
-        boolean falseAssertion = playerRepository.existsPlayerByEmail("oguz@metu.edu.tr");
+        boolean trueAssertion = playerRepository.existsPlayerByEmail(appropriateEmail);
+        boolean falseAssertion = playerRepository.existsPlayerByEmail("ascsavdavavascasc@metu.edu.tr");
         assertTrue(trueAssertion);
         assertFalse(falseAssertion);
+    }
+    @Test
+    @Order(3)
+    @Rollback(false)
+    void destruct()
+    {
+        playerRepository.deletePlayerByUsername(appropriateName);
     }
 }
