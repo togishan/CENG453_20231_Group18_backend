@@ -50,6 +50,17 @@ public class GameBoard {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Settlement> player4Settlements = new ArrayList<>();
 
+    @ElementCollection
+    private List<String> gameEvents = new ArrayList<>();
+
+    public void addEvent(String event) {
+        gameEvents.add(event);
+    }
+
+    public List<String> getGameEvents() {
+        return gameEvents;
+    }
+
     // Universal and constant GameBoardDictionary for all games
     @Transient
     public static final GameBoardDictionary gameBoardDictionary = new GameBoardDictionary();
@@ -88,6 +99,21 @@ public class GameBoard {
         Random rand = new Random();
         int randomIndex = rand.nextInt(appropriateEdges.size());
         return appropriateEdges.get(randomIndex);
+    }
+
+    /**
+     * This method simulates the rolling of two six-sided dice.
+     * Each die will have a randomly generated number between 1 and 6.
+     * The results are returned as an array of two integers.
+     *
+     * @return An array of two integers, each between 1 and 6.
+     */
+    public int[] rollTheDice() {
+        Random rand = new Random();
+        int dice1 = rand.nextInt(6) + 1;  
+        int dice2 = rand.nextInt(6) + 1; 
+        addEvent("Rolled the dice: " + dice1 + ", " + dice2);
+        return new int[] {dice1, dice2}; 
     }
 
     /**
@@ -395,15 +421,19 @@ public class GameBoard {
         switch (playerNo) {
             case 1:
                 player1Settlements.add(settlement);
+                addEvent("Player 1 added a settlement at node " + settlement.getNodeIndex());
                 break;
             case 2:
                 player2Settlements.add(settlement);
+                addEvent("Player 2 added a settlement at node " + settlement.getNodeIndex());
                 break;
             case 3:
                 player3Settlements.add(settlement);
+                addEvent("Player 3 added a settlement at node " + settlement.getNodeIndex());
                 break;
             case 4:
                 player4Settlements.add(settlement);
+                addEvent("Player 4 added a settlement at node " + settlement.getNodeIndex());
                 break;
             default:
                 // If the player number is not valid, do nothing
@@ -460,15 +490,19 @@ public class GameBoard {
         switch (playerNo) {
             case 1:
                 player1Roads.add(road);
+                addEvent("Player 1 added a road at edge " + road.getEdgeIndex());
                 break;
             case 2:
                 player2Roads.add(road);
+                addEvent("Player 2 added a road at edge " + road.getEdgeIndex());
                 break;
             case 3:
                 player3Roads.add(road);
+                addEvent("Player 3 added a road at edge " + road.getEdgeIndex());
                 break;
             case 4:
                 player4Roads.add(road);
+                addEvent("Player 4 added a road at edge " + road.getEdgeIndex());
                 break;
             default:
                 // If the player number is not valid, do nothing
@@ -611,9 +645,10 @@ public class GameBoard {
         // If the settlement exists and is not already upgraded, upgrade it
         if (settlement != null && settlement.getSettlementLevel() == 1) {
             settlement.setSettlementLevel(2);
+            addEvent("Player " + playerNo + " upgraded a settlement at node " + nodeIndex);
             return settlement;
         }
-
+        
         return null;
     }
 

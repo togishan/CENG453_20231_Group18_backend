@@ -37,6 +37,27 @@ public class GameService {
         return gameRepository.save(game);
     }
 
+    @Transactional
+    public Game createMultiPlayerGame(List<Player> players) {
+        if (players == null || players.isEmpty()) {
+            throw new IllegalArgumentException("players must not be null or empty");
+        }
+
+        Player player1 = players.get(0);
+        Player player2 = players.size() > 1 ? players.get(1) : null;
+        Player player3 = players.size() > 2 ? players.get(2) : null;
+        Player player4 = players.size() > 3 ? players.get(3) : null;
+
+        Game game = new Game(player1, player2, player3, player4, GameType.MultiPlayer);
+
+        GameBoard gameboard = game.getGameboard();
+        if (gameboard != null) {
+            gameBoardRepository.save(gameboard);
+        }
+
+        return gameRepository.save(game);
+    }
+
     public List<Game> getAllGames()
     {
         return (List<Game>) gameRepository.findAll();
@@ -155,13 +176,14 @@ public class GameService {
         {
             return -5;
         }
-        game.setDiceRolled(true);
-        Random rand = new Random();
-        int currentDice1 = rand.nextInt(1,7);
-        int currentDice2 = rand.nextInt(1,7);
+        GameBoard gameboard = game.getGameboard();
+        int[] diceResults = gameboard.rollTheDice();
+        int currentDice1 = diceResults[0];
+        int currentDice2 = diceResults[1];
         game.setCurrentDice1(currentDice1);
         game.setCurrentDice2(currentDice2);
         game.distributeAllCards(currentDice1 + currentDice2);
+        game.setDiceRolled(true);
         return 0;
     }
 
@@ -204,28 +226,29 @@ public class GameService {
         Game game = gameRepository.getGameByGameID(gameID);
         // We already checked if the game exists, no need to check again
 
-        // Check if the dice is rolled
-        if(game.getDiceRolled())
-        {
-            return -5;
-        }
 
         // Save the score of player1
         savePlayerScore(game.getPlayer1(), game.getPlayer1Score());
 
         // If the game is multiplayer, save the scores of the other players
-        if (game.getGameType() == GameType.Multiplayer) {
-            savePlayerScore(game.getPlayer2(), game.getPlayer2Score());
-            savePlayerScore(game.getPlayer3(), game.getPlayer3Score());
-            savePlayerScore(game.getPlayer4(), game.getPlayer4Score());
+        if (game.getGameType() == GameType.MultiPlayer) {
+            if (game.getPlayer2() != null) {
+                savePlayerScore(game.getPlayer2(), game.getPlayer2Score());
+            }
+            if (game.getPlayer3() != null) {
+                savePlayerScore(game.getPlayer3(), game.getPlayer3Score());
+            }
+            if (game.getPlayer4() != null) {
+                savePlayerScore(game.getPlayer4(), game.getPlayer4Score());
+            }
         }
 
         // Delete the game
         if (!deleteGame(gameID)) {
-            return -6;  // Failed to delete game
+            return -7;  // Failed to delete game
         }
 
-        return 0;  // Game ended and deleted successfully
+        return -8;  // Game ended and deleted successfully
     }
 
     private void savePlayerScore(Player player, int score) {

@@ -63,7 +63,7 @@ public class Game {
     @Column(name = "turn")
     private Integer turn;
 
-    // SinglePlayer or Multiplayer
+    // SinglePlayer or MultiPlayer
     @Column(name = "game_type")
     private GameType gameType = GameType.SinglePlayer; // default value
 
@@ -315,6 +315,10 @@ public class Game {
             }
             // transfer score to the new owner
             incrementPlayerScore(tempCurrentLongestRoadOwnerPlayerNo, 2);
+            gameboard.addEvent("The owner of the longest road changed from player " + currentLongestRoadOwnerPlayerNo + " to player " + tempCurrentLongestRoadOwnerPlayerNo);
+        }
+        if(currentLongestRoadLength != tempCurrentLongestRoadLength) {
+            gameboard.addEvent("The longest road length changed from " + currentLongestRoadLength + " to " + tempCurrentLongestRoadLength);
         }
         currentLongestRoadLength = tempCurrentLongestRoadLength;
         currentLongestRoadOwnerPlayerNo = tempCurrentLongestRoadOwnerPlayerNo;
