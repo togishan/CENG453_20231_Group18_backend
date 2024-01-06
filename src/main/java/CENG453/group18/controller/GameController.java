@@ -76,12 +76,14 @@ public class GameController {
     }
 
     @PostMapping("/createMultiPlayer")
-    public ResponseEntity<?> createMultiPlayerGame(List<String> usernames) {
-        if (usernames == null || usernames.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usernames cannot be null or empty.");
+    public ResponseEntity<?> createMultiPlayerGame(String username1, String username2, String username3, String username4) {
+        if (username1 == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username1 cannot be null.");
         }
 
         List<Player> players = new ArrayList<>();
+        String[] usernames = {username1, username2, username3, username4};
+
         for (String username : usernames) {
             Player player = playerRepository.findPlayerByUsername(username);
             if (player == null) {
