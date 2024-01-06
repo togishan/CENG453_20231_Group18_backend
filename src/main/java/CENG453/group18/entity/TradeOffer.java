@@ -20,4 +20,20 @@ public class TradeOffer {
         this.requested = requested;
     }
 
+    public int getTradeOfferID() {
+        return tradeOfferID;
+    }
+
+    public int getPlayerNo() {
+        return playerNo;
+    }
+
+    public Map<CardType, Integer> getOffered() {
+        return offered;
+    }
+
+    public Map<CardType, Integer> getRequested() {
+        return requested;
+    }
+
 }
