@@ -85,6 +85,10 @@ public class GameController {
         String[] usernames = {username1, username2, username3, username4};
 
         for (String username : usernames) {
+            if (username == null) {
+                continue;  // Skip this iteration if username is null
+            }
+
             Player player = playerRepository.findPlayerByUsername(username);
             if (player == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Player not found for username: " + username);
