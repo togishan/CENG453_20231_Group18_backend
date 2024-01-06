@@ -5,10 +5,7 @@ import CENG453.group18.entity.Game;
 import CENG453.group18.entity.Player;
 import CENG453.group18.enums.GameType;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -21,19 +18,20 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @DataJpaTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Rollback(false)
 public class GameRepositoryTest {
     @Autowired
     private PlayerRepository playerRepository;
     @Autowired
     private GameRepository gameRepository;
-    private Game game;
     private Integer gameID;
-    private String appropriateName1 = "oguzhancsacsasc22332";
-    private String appropriateEmail1 = "oguzhanvdsdvsa22332@metu.edu.tr";
+
+    private final String appropriateName1 = "oguzhancsacsasc22332";
+    private String appropriateEmail1 = "oguzhanvdsdvsssssa22332@metu.edu.tr";
 
     private Player player;
     @Test
-    @Order(1)
+    @Order(0)
     @Rollback(false)
     void deleteUsers()
     {
@@ -41,7 +39,7 @@ public class GameRepositoryTest {
     }
     @Test
     @Order(1)
-    @Rollback(false)
+    @Rollback(value = false)
     void registerGameHost()
     {
         Player player = new Player();
@@ -51,20 +49,14 @@ public class GameRepositoryTest {
         playerRepository.save(player);
 
     }
-    @Test
-    @Order(2)
-    @Rollback(false)
-    void initializeRepository()
-    {
-        game = new Game(player, null, null, null, GameType.SinglePlayer);
-        gameID = gameRepository.save(game).getGameID();
-        System.out.println(gameID);
-    }
 
     @Test
-    @Order(3)
-    void testGetGameByID()
+    @Order(2)
+    void testAllIDMethods()
     {
+        Game game = new Game(player, null, null, null, GameType.SinglePlayer);
+        this.gameID = gameRepository.save(game).getGameID();
+        System.out.println(gameID);
         // test by not existing gameID
         Game notExistingGame = gameRepository.getGameByGameID(111111);
         assertNull(notExistingGame);
@@ -72,24 +64,14 @@ public class GameRepositoryTest {
         // test by existing gameID
         Game existingGame = gameRepository.getGameByGameID(gameID);
         assertNotNull(existingGame);
-    }
-    @Test
-    @Order(4)
-    void testDeleteAndExistGameByGameID()
-    {
         // check game exists then delete the game and check again
-        boolean existingGame = gameRepository.existsGameByGameID(gameID);
-        assertTrue(existingGame);
+        boolean existingGame2 = gameRepository.existsGameByGameID(gameID);
+        assertTrue(existingGame2);
         gameRepository.deleteGameByGameID(gameID);
-        boolean notExistingGame = gameRepository.existsGameByGameID(gameID);
-        assertFalse(notExistingGame);
-    }
-    @Test
-    @Order(6)
-    @Rollback(false)
-    void destruct()
-    {
+        boolean notExistingGame2 = gameRepository.existsGameByGameID(gameID);
+        assertFalse(notExistingGame2);
         gameRepository.deleteGameByGameID(gameID);
         playerRepository.deletePlayerByUsername(appropriateName1);
     }
+
 }
