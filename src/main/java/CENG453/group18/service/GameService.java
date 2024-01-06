@@ -30,7 +30,10 @@ public class GameService {
     {
         Player player = playerRepository.findPlayerByUsername(username);
         Game game = new Game(player, null, null, null, GameType.SinglePlayer);
-        gameBoardRepository.save(game.getGameboard());
+        GameBoard gameboard = game.getGameboard();
+        if (gameboard != null) {
+            gameBoardRepository.save(gameboard);
+        }
         return gameRepository.save(game);
     }
 
@@ -281,6 +284,9 @@ public class GameService {
     }
 
     public boolean doesGameExist(Integer gameID) {
+        if (gameID == null) {
+            throw new IllegalArgumentException("gameID must not be null");
+        }
         return gameRepository.existsById(gameID);
     }
 
