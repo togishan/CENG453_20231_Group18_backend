@@ -59,6 +59,18 @@ public class GameService {
         return gameRepository.save(game);
     }
 
+    public int getBotCount(int gameId) {
+        Game game = gameRepository.getGameByGameID(gameId);
+        if (game == null) {
+            throw new IllegalArgumentException("Game not found for id: " + gameId);
+        }
+
+        // Assuming you have a method in your Game class to get bot count
+        int botCount = game.getBotCount();
+
+        return botCount;
+    }
+
     public int turn(int gameId) {
         Game game = gameRepository.getGameByGameID(gameId);
         

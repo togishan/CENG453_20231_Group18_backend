@@ -213,6 +213,22 @@ public class GameController {
         return ResponseEntity.ok(turnResult);
     }
 
+    @GetMapping("/botcount")
+    public ResponseEntity<?> botCount(Integer gameId) {
+        if (gameId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("GameId cannot be null.");
+        }
+
+        Game game = gameService.getGameState(gameId);
+        if (game == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found for id: " + gameId);
+        }
+        
+        int botCount = gameService.getBotCount(gameId);
+
+        return ResponseEntity.ok(botCount);
+    }
+
     @Autowired
     private GameRepository gameRepository;
 

@@ -132,6 +132,22 @@ public class Game {
         return this.turn;
     }
 
+    public int getBotCount() {
+        int botCount = 0;
+        int currentTurn = getTurn();
+
+        Player[] players = new Player[]{player1, player2, player3, player4};
+
+        for (int i = (currentTurn + 1) % players.length; i != currentTurn; i = (i + 1) % players.length) {
+            Player player = players[i];
+            if (player.getUsername() == null) {
+                botCount++;
+            }
+        }
+
+        return botCount;
+    }
+
     private void distributeInitialCards() {
         // cards from tiles
         for(int i = 2; i < 13; i++) {
