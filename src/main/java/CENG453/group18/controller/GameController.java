@@ -5,6 +5,7 @@ import CENG453.group18.entity.Game;
 //import CENG453.group18.entity.Settlement;
 import CENG453.group18.entity.Player;
 import CENG453.group18.repository.PlayerRepository;
+import CENG453.group18.repository.GameRepository;
 import CENG453.group18.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,6 +21,8 @@ import org.springframework.http.HttpStatus;
 //import java.sql.SQLException;
 import java.util.List;
 //import java.util.Set;
+
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/game")
@@ -70,6 +73,63 @@ public class GameController {
         Game game = gameService.createSinglePlayerGame(username);
 
         return ResponseEntity.ok(game);
+    }
+
+    @PostMapping("/createMultiPlayer")
+    public ResponseEntity<?> createMultiPlayerGame(List<String> usernames) {
+        if (usernames == null || usernames.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usernames cannot be null or empty.");
+        }
+
+        List<Player> players = new ArrayList<>();
+        for (String username : usernames) {
+            Player player = playerRepository.findPlayerByUsername(username);
+            if (player == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Player not found for username: " + username);
+            }
+            players.add(player);
+
+            Game existingGame = gameService.findGameByPlayer(player);
+            if (existingGame != null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("A game already exists for player: " + username);
+            }
+        }
+
+        Game game = gameService.createMultiPlayerGame(players);
+
+        return ResponseEntity.ok(game);
+    }
+
+    @GetMapping("/getGame")
+    public ResponseEntity<?> getGame(Integer gameId) {
+        if (gameId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("GameId cannot be null.");
+        }
+
+        Game game = gameService.getGameState(gameId);
+        if (game == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found for id: " + gameId);
+        }
+
+        return ResponseEntity.ok(game);
+    }
+
+    @Autowired
+    private GameRepository gameRepository;
+
+    @GetMapping("/getGameEvents")
+    public ResponseEntity<?> getGameEvents(Integer gameId) {
+        if (gameId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("GameId cannot be null.");
+        }
+
+        Game game = gameRepository.getGameByGameID(gameId);
+        if (game == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game not found for id: " + gameId);
+        }
+
+        List<String> gameEvents = game.getGameboard().getGameEvents();
+        return ResponseEntity.ok(gameEvents);
     }
 
     @PostMapping("/joinExistingGame")
