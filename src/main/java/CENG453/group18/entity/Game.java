@@ -1,6 +1,7 @@
 package CENG453.group18.entity;
 
 //import CENG453.group18.dictionary.GameBoardDictionary;
+import CENG453.group18.dictionary.GameBoardDictionary;
 import CENG453.group18.dictionary.NodeDictionaryObject;
 import CENG453.group18.enums.CardType;
 import CENG453.group18.enums.GameType;
@@ -86,6 +87,7 @@ public class Game {
     @Column(name = "diceRolled")
     private Boolean diceRolled;
 
+    @Transient
     private List<TradeOffer> tradeOffers;
 
     public Game(Player player1, Player player2, Player player3, Player player4, GameType gameType) {

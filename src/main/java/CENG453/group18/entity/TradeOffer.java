@@ -3,7 +3,9 @@ package CENG453.group18.entity;
 import java.util.Map;
 
 import CENG453.group18.enums.CardType;
+import lombok.Getter;
 
+@Getter
 public class TradeOffer {
     private static int idCounter = 0;
     private int tradeOfferID;
@@ -18,19 +20,4 @@ public class TradeOffer {
         this.requested = requested;
     }
 
-    public int getTradeOfferID() {
-        return tradeOfferID;
-    }
-
-    public int getPlayerNo() {
-        return playerNo;
-    }
-
-    public Map<CardType, Integer> getOffered() {
-        return offered;
-    }
-
-    public Map<CardType, Integer> getRequested() {
-        return requested;
-    }
 }
