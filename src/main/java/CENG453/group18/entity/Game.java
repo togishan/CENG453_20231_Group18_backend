@@ -134,21 +134,27 @@ public class Game {
         return this.turn;
     }
 
-    /*public int getBotCount() {
+    public int getBotCount() {
         int botCount = 0;
         int currentTurn = getTurn();
 
+        System.out.println("Current turn: " + currentTurn); // print the current turn
+
         Player[] players = new Player[]{player1, player2, player3, player4};
 
-        for (int i = (currentTurn + 1) % players.length; i != currentTurn; i = (i + 1) % players.length) {
+        for (int i = (currentTurn + 1) % 4; i != currentTurn; i = (i + 1) % 4) {
             Player player = players[i];
-            if (player == null) {
-                botCount++;
+            if (player != null) {
+                System.out.println("Checking player at index: " + i + " with username: " + player.getUsername()); // print the index of the player being checked and the username
+                if (player.getUsername() == null) {
+                    botCount++;
+                    System.out.println("Player at index " + i + " is a bot"); // print a message if the player is a bot
+                }
             }
         }
 
         return botCount;
-    }*/
+    }
 
     private void distributeInitialCards() {
         // cards from tiles
