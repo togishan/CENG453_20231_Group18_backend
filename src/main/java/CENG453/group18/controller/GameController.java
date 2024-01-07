@@ -213,7 +213,7 @@ public class GameController {
         return ResponseEntity.ok(turnResult);
     }
 
-    @GetMapping("/botcount")
+    /*@GetMapping("/botcount")
     public ResponseEntity<?> botCount(Integer gameId) {
         if (gameId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("GameId cannot be null.");
@@ -227,7 +227,7 @@ public class GameController {
         int botCount = gameService.getBotCount(gameId);
 
         return ResponseEntity.ok(botCount);
-    }
+    }*/
 
     @Autowired
     private GameRepository gameRepository;

@@ -132,7 +132,7 @@ public class Game {
         return this.turn;
     }
 
-    public int getBotCount() {
+    /*public int getBotCount() {
         int botCount = 0;
         int currentTurn = getTurn();
 
@@ -146,7 +146,7 @@ public class Game {
         }
 
         return botCount;
-    }
+    }*/
 
     private void distributeInitialCards() {
         // cards from tiles
