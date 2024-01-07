@@ -78,7 +78,11 @@ public class GameController {
     }
 
     @PostMapping("/createMultiPlayer")
-    public ResponseEntity<?> createMultiPlayerGame(String username1, String username2, String username3, String username4) {
+    public ResponseEntity<?> createMultiPlayerGame(
+        @RequestParam String username1,
+        @RequestParam String username2,
+        @RequestParam(required = false) String username3,
+        @RequestParam(required = false) String username4) {
         if (username1 == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username1 cannot be null.");
         }
