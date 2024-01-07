@@ -32,7 +32,9 @@ public class PlayerCardDeck {
             if (cardType == card.getCardType()) {
                 card.incrementCardCount(count);
             }
+
         }
+
     }
 
     public void decrementResourceCounts(CardType cardType, int count)

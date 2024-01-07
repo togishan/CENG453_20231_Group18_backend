@@ -81,7 +81,8 @@ public class Game {
     private Integer currentLongestRoadLength;
     @Column(name = "current_longest_road_owner_playerNo")
     private Integer currentLongestRoadOwnerPlayerNo;
-
+    @Column(name = "longest_road_bonus_active")
+    private Boolean longest_road_bonus_active;
     // whether the dice is rolled for this turn
     @Column(name = "diceRolled")
     private Boolean diceRolled;
@@ -100,6 +101,7 @@ public class Game {
         this.currentLongestRoadLength = 0;
         this.currentLongestRoadOwnerPlayerNo = 0;
         this.diceRolled = false;
+        this.longest_road_bonus_active = false;
         if(gameType == GameType.SinglePlayer) {
             this.player1 = player1;
         }
@@ -245,11 +247,10 @@ public class Game {
 
     public boolean cheat(int playerNo, Map<CardType, Integer> requested) {
         // Get the PlayerCardDeck for the specified player
-        PlayerCardDeck playerDeck = playerCardDeckList.get(playerNo - 1);
 
         // For each requested resource, increment the count in the player's deck
         requested.forEach((cardType, count) ->
-            playerDeck.incrementResourceCounts(cardType, count));
+            playerCardDeckList.get(playerNo - 1).incrementResourceCounts(cardType, count));
         
         // Return true to indicate that the cheat was successful
         return true;
@@ -451,11 +452,12 @@ public class Game {
         {
             // if the previous owner's road length is >= threshold, then decrement its score since it was
             // getting 2 points from it, but it is not the owner of the longest road anymore
-            if(currentLongestRoadLength >= 5)
+            if(longest_road_bonus_active && currentLongestRoadLength >= 5)
             {
                 decrementPlayerScore(currentLongestRoadOwnerPlayerNo, 2);
             }
             // transfer score to the new owner
+            longest_road_bonus_active = true;
             incrementPlayerScore(tempCurrentLongestRoadOwnerPlayerNo, 2);
             gameboard.addEvent("The owner of the longest road changed from player " + currentLongestRoadOwnerPlayerNo + " to player " + tempCurrentLongestRoadOwnerPlayerNo);
         }

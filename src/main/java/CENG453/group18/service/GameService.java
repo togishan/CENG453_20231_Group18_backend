@@ -76,7 +76,7 @@ public class GameService {
         
         return game.getTurn();
     }
-
+    @Transactional
     public boolean cheat(int gameId, int playerNo, Map<CardType, Integer> requested) {
         Game game = gameRepository.getGameByGameID(gameId);
         if (game == null) {
