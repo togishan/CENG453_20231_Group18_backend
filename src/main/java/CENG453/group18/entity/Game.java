@@ -134,7 +134,7 @@ public class Game {
         return this.turn;
     }
 
-    public int getBotCount() {
+public int getBotCount() {
         int botCount = 0;
         int currentTurn = getTurn();
 
@@ -149,6 +149,9 @@ public class Game {
                 if (player.getUsername() == null) {
                     botCount++;
                     System.out.println("Player at index " + i + " is a bot"); // print a message if the player is a bot
+                } else {
+                    // If the player is not a bot, break out of the loop
+                    break;
                 }
             }
         }
