@@ -140,7 +140,7 @@ public class Game {
 
         for (int i = (currentTurn + 1) % players.length; i != currentTurn; i = (i + 1) % players.length) {
             Player player = players[i];
-            if (player.getUsername() == null) {
+            if (player == null) {
                 botCount++;
             }
         }
