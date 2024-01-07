@@ -5,7 +5,7 @@
 [http://localhost:8080/swagger-ui/index.html#/](http://localhost:8080/swagger-ui/index.html#/)
 
 ### Database Schema
-[/documents/DatabaseSchema.pdf](/documents/DatabaseSchema.pdf)
+[/documents/CENG453_ER.pdf](/documents/CENG453_ER.pdf)
 
 ### Render Page
 [https://app-6i6b.onrender.com](https://app-6i6b.onrender.com) <br>
