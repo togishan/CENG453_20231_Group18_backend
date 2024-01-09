@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: CENG453.group18.repository.GameRepositoryTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.634 s - in CENG453.group18.repository.GameRepositoryTest

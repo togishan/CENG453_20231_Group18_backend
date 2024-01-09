@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: CENG453.group18.service.PlayerServiceTest
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.303 s - in CENG453.group18.service.PlayerServiceTest

@@ -1,0 +1,11 @@
+CENG453\group18\entity\ScoreTest.class
+CENG453\group18\repository\PlayerRepositoryTest.class
+CENG453\group18\controller\GameControllerTest.class
+CENG453\group18\service\ScoreServiceTest.class
+CENG453\group18\service\GameServiceTest.class
+CENG453\group18\entity\GameTest.class
+CENG453\group18\AppApplicationTests.class
+CENG453\group18\service\PlayerServiceTest.class
+CENG453\group18\repository\ScoreRepositoryTest.class
+CENG453\group18\entity\PlayerTest.class
+CENG453\group18\repository\GameRepositoryTest.class
